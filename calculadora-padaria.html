@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Preço - Padaria Freitas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .container {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .sidebar {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    input, button {
+      margin: 10px 0;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: transform 0.1s ease-in-out;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      color: white;
+      font-size: 1em;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .product-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .product-item {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #e6ffe6;
+    }
+
+    .delete-btn {
+      background-color: #ff4d4d;
+      padding: 3px 8px;
+      font-size: 12px;
+      align-self: flex-end;
+    }
+
+    .save-btn {
+      background-color: #28a745;
+    }
+
+    .clear-btn {
+      background-color: #dc3545;
+    }
+
+    .add-product-btn {
+      background-color: #28a745;
+    }
+
+    .price-green {
+      color: green;
+      font-weight: bold;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #581d22;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .logo-container img {
+      max-width: 60%;
+      height: auto;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      margin: 0 auto;
+    }
+
+    .logo-container h2,
+    .logo-container p {
+      color: white;
+      margin: 5px 0;
+    }
+
+    .controls-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .controls-container button {
+      padding: 5px 10px;
+      font-size: 0.9em;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        flex-direction: row;
+      }
+
+      .container {
+        border-right: 1px solid #ddd;
+        border-bottom: none;
+      }
+
+      .sidebar {
+        border-left: 1px solid #ddd;
+      }
+
+      .logo-container img {
+        max-width: 40%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <h2>Calculadora de Preço</h2>
+      <p>Padaria Freitas</p>
+    </div>
+    <input type="text" id="produto" placeholder="Nome do produto" />
+    <input type="text" id="precoCusto" placeholder="Preço de custo (R$)" />
+    <input type="number" id="quantidade" placeholder="Quantidade" />
+    <button class="add-product-btn" onclick="adicionarProduto()">Adicionar Produto</button>
+    <ul class="product-list" id="listaProdutos"></ul>
+  </div>
+  <div class="sidebar">
+    <div class="controls-container">
+      <button class="save-btn" onclick="salvarProdutos()">Salvar Lista</button>
+      <button class="clear-btn" onclick="limparLista()">Limpar Lista</button>
+    </div>
+  </div>
+
+  <!-- Áudio do cadastro -->
+  <audio id="somCadastro" src="sucesso.mp3" preload="auto"></audio>
+
+  <script>
+    const precoCustoInput = document.getElementById("precoCusto");
+
+    precoCustoInput.addEventListener("input", function (e) {
+      let valor = e.target.value.replace(/\D/g, "");
+      valor = (parseInt(valor, 10) / 100).toFixed(2);
+      e.target.value = "R$" + valor.replace(".", ",");
+    });
+
+    function parsePreco(precoFormatado) {
+      return parseFloat(precoFormatado.replace("R$", "").replace(".", "").replace(",", ".")) || 0;
+    }
+
+    function calcularPrecoVenda(precoCusto, quantidade) {
+      const precoPorUnidade = precoCusto / (quantidade || 1);
+      let precoVenda;
+
+      if (precoPorUnidade <= 5) {
+        precoVenda = precoPorUnidade * 1.75;
+      } else {
+        precoVenda = precoPorUnidade * 1.5;
+      }
+
+      precoVenda = Math.ceil(precoVenda * 4) / 4; // múltiplo de 0,25
+      return precoVenda;
+    }
+
+    function adicionarProduto() {
+      const nomeProduto = document.getElementById("produto").value.trim();
+      const precoCustoFormatado = document.getElementById("precoCusto").value.trim();
+      const quantidade = parseInt(document.getElementById("quantidade").value.trim()) || 1;
+
+      if (!nomeProduto || !precoCustoFormatado) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+      }
+
+      const precoCusto = parsePreco(precoCustoFormatado);
+      const precoVenda = calcularPrecoVenda(precoCusto, quantidade);
+
+      const item = document.createElement("li");
+      item.className = "product-item";
+      item.innerHTML = `
+        <strong>${nomeProduto}</strong>
+        <span>Preço de Custo: <strong>R$ ${precoCusto.toFixed(2).replace(".", ",")}</strong></span>
+        <span>Quantidade: ${quantidade}</span>
+        <span>Preço de Venda: <span class="price-green">R$ ${precoVenda.toFixed(2).replace(".", ",")}</span></span>
+        <button class="delete-btn" onclick="this.parentElement.remove()">Remover</button>
+      `;
+
+      const lista = document.getElementById("listaProdutos");
+      lista.insertBefore(item, lista.firstChild); // adiciona no topo da lista
+
+      // Reproduzir som
+      const som = document.getElementById("somCadastro");
+      som.currentTime = 0;
+      som.play();
+
+      document.getElementById("produto").value = "";
+      document.getElementById("precoCusto").value = "";
+      document.getElementById("quantidade").value = "";
+    }
+
+    function salvarProdutos() {
+      const lista = document.getElementById("listaProdutos").innerHTML;
+      localStorage.setItem("produtosPadaria", lista);
+      alert("Lista salva com sucesso!");
+    }
+
+    function limparLista() {
+      if (confirm("Tem certeza que deseja limpar a lista?")) {
+        document.getElementById("listaProdutos").innerHTML = "";
+        localStorage.removeItem("produtosPadaria");
+      }
+    }
+
+    window.onload = function () {
+      const listaSalva = localStorage.getItem("produtosPadaria");
+      if (listaSalva) {
+        document.getElementById("listaProdutos").innerHTML = listaSalva;
+      }
+    };
+  </script>
+</body>
+</html>
