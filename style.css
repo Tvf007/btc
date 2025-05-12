@@ -1,0 +1,161 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;background:#f9f5f0;min-height:100vh}
+header{background:#0055a5;padding:1rem;text-align:center;color:#fff;width:100%}
+main{width:400px;max-width:100%;padding:1rem}
+.products{display:flex;gap:.5rem;justify-content:space-between;margin-bottom:1rem}
+.product{position:relative;background:#ffa500;flex:1;border-radius:.5rem;padding:1rem;text-align:center}
+.product .pencil{position:absolute;top:.5rem;right:.5rem;cursor:pointer;font-size:1.25rem}
+.product .label{font-weight:bold;font-size:1rem;margin-bottom:.75rem}
+.product .count{font-size:1.5rem}
+.custom{margin-bottom:1rem;width:100%}
+.custom.active input{border:1px solid #0055a5;background:#e0f7fa}
+.custom input{width:calc(100%-2rem);padding:.75rem;margin:.5rem 0;font-size:1.25rem;border:1px solid #ccc;border-radius:.25rem}
+.actions{margin-bottom:1rem;width:100%;display:flex;gap:.5rem}
+.actions button{flex:1;padding:1rem;border:none;border-radius:.5rem;font-size:1.25rem;cursor:pointer}
+#finalize{background:#28a745;color:#fff}
+#clear{background:#dc3545;color:#fff}
+.summary{background:#fff;padding:.5rem;border-radius:.25rem;margin-bottom:1rem;max-height:120px;overflow-y:auto}
+.summary h3{margin-bottom:.5rem;font-size:1rem;text-align:center}
+.summary ul{list-style:none;padding-left:.5rem}
+.summary li{margin-bottom:.25rem;font-size:.9rem}
+.history h2{margin-bottom:.5rem;font-size:1rem}
+.history ul{list-style:none;max-height:200px;overflow-y:auto;padding-left:0}
+.history li{background:#fff;padding:.75rem;margin-bottom:.5rem;border-radius:.25rem;font-size:1rem}
+.keypad{position:fixed;bottom:0;left:0;width:100%;background:#ddd;padding:.5rem;box-shadow:0 -2px 5px rgba(0,0,0,.2)}
+.keypad.hidden{display:none}
+.keypad .display{background:#fff;margin-bottom:.5rem;padding:.75rem;font-size:1.5rem;text-align:right;border-radius:.25rem}
+.keypad .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:.25rem}
+.keypad .key,#key-clear,#key-back{padding:1rem;font-size:1.5rem;border:none;border-radius:.25rem;background:#fff}
+#key-ok.ok{grid-column:span 3;background:#28a745;color:#fff}
+@media(max-width:400px){.products{flex-direction:column}.product{margin-bottom:.5rem}}
+
+
+#live-total-badge.show {
+  opacity: 1;
+}
+
+
+/* Fixed total display below products */
+#fixed-total {
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Received input styled as button */
+.received-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.25rem;
+  text-align: center;
+  border: none;
+  border-radius: 0.5rem;
+  background: #28a745;
+  color: #fff;
+  margin: 0.5rem 0;
+}
+.received-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.5);
+}
+
+
+/* Disable double-tap zoom */
+html, body {
+  touch-action: manipulation;
+}
+
+/* Style for insertion cursor focus */
+input:focus {
+  outline: 2px solid #0055a5;
+  caret-color: #000;
+}
+
+/* Reposition and enlarge OK button */
+#key-ok {
+  grid-column: span 3;
+  background: #28a745;
+  color: #fff;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+
+/* Theme toggle button */
+#theme-toggle {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #0055a5;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 0.75rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+/* Calculator and other icons spacing */
+.icon {
+  margin-right: 0.5rem;
+}
+
+/* Received input white background */
+.received-input {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc !important;
+}
+
+/* Fixed total highlight in green */
+#fixed-total {
+  color: #28a745 !important;
+}
+
+/* Dark mode styles */
+body.dark {
+  background: #121212;
+  color: #e0e0e0;
+}
+body.dark header {
+  background: #1f1f1f;
+}
+body.dark .product {
+  background: #333;
+}
+body.dark .received-input {
+  background: #444 !important;
+  color: #e0e0e0 !important;
+}
+body.dark input {
+  color: #e0e0e0;
+}
+
+
+/* Draggable theme toggle */
+.draggable {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  touch-action: none;
+}
+
+/* Highlight troco */
+#change {
+  font-size: 1.5rem;
+  color: #007bff;
+  font-weight: bold;
+}
+
+
+/* Centralize and highlight received and change */
+.received-input, #change {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
