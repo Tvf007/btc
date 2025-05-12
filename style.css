@@ -1,0 +1,39 @@
+:root {
+  --bg: #f9f5f0; --fg: #000;
+  --header-bg: #0055a5; --product-bg: #ffa500;
+  --button-bg: #0055a5; --button-fg: #fff;
+  --ok-bg: #28a745; --clear-bg: #dc3545;
+  --history-bg: #fff; --key-bg: #ddd; --key-fg: #000;
+}
+.dark {
+  --bg: #121212; --fg: #eee;
+  --header-bg: #333; --product-bg: #444;
+  --button-bg: #0055a5; --button-fg: #fff;
+  --ok-bg: #008000; --clear-bg: #800000;
+  --history-bg: #222; --key-bg: #555; --key-fg: #fff;
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background: var(--bg); color: var(--fg); display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+#theme-toggle { position: fixed; top: 1rem; left: 1rem; font-size: 1.5rem; cursor: grab; user-select: none; }
+header { background: var(--header-bg); padding:1rem; text-align:center; color:var(--button-fg); width:100%; }
+main { width:400px; max-width:100%; padding:1rem; }
+.products { display:flex; gap:0.5rem; justify-content:space-between; margin-bottom:1rem; }
+.product { position:relative; background:var(--product-bg); flex:1; border-radius:0.5rem; padding:1rem; text-align:center; }
+.pencil { position:absolute; top:0.5rem; right:0.5rem; cursor:pointer; font-size:1.25rem; }
+.label { font-weight:bold; font-size:1rem; margin-bottom:0.75rem; }
+.count { font-size:1.5rem; }
+.custom, .nota, .actions { margin-bottom:1rem; width:100%; }
+.custom input, .nota input { width:calc(100% - 2rem); padding:0.75rem; margin:0.5rem 0; font-size:1.25rem; }
+.custom button, .actions button { width:100%; padding:1rem; border:none; border-radius:0.5rem; font-size:1.25rem; cursor:pointer; background:var(--button-bg); color:var(--button-fg); }
+#finalize { background: var(--ok-bg); margin-right:0.5rem; }
+#clear { background: var(--clear-bg); }
+.history h2 { margin-bottom:0.5rem; font-size:1rem; }
+.history ul { list-style:none; max-height:200px; overflow-y:auto; }
+.history li { background:var(--history-bg); padding:0.75rem; margin-bottom:0.5rem; border-radius:0.25rem; font-size:1rem; }
+.keypad { position:fixed; bottom:0; left:0; width:100%; background:var(--key-bg); padding:0.5rem; box-shadow:0 -2px 5px rgba(0,0,0,0.2); }
+.keypad.hidden { display:none; }
+.display { background:var(--history-bg); margin-bottom:0.5rem; padding:0.75rem; font-size:1.5rem; text-align:right; border-radius:0.25rem; color:var(--fg); }
+.keys { display:grid; grid-template-columns:repeat(3,1fr); gap:0.25rem; }
+.key, #key-clear, #key-back { padding:1rem; font-size:1.5rem; border:none; border-radius:0.25rem; background:var(--history-bg); color:var(--key-fg); }
+#key-ok.ok { grid-column:span 3; background:var(--ok-bg); color:var(--button-fg); padding:1.25rem; font-size:2rem; }
+@media(max-width:400px){ .products{flex-direction:column;} .product{margin-bottom:0.5rem;} }
