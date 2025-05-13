@@ -1,5 +1,0 @@
-## Exemplos de uso de cores (contraste ≥4.5:1)
-- **Botão primário**: background var(--color-primary), texto #fff
-- **Texto de alerta**: color var(--color-alert) em parágrafos
-- **Hover de secundário**: background var(--color-secondary-hover)
-- **Labels**: color var(--color-muted)
