@@ -1,0 +1,3545 @@
+    // SISTEMA DE NOTIFICAÇÕES
+    function showNotification(message, type = 'success') {
+      try {
+        if (!notification || !notificationMessage) return;
+        
+        notificationMessage.textContent = message;
+        notification.className = `notification ${type} show`;
+        
+        const iconElement = notification.querySelector('.notification-icon');
+        if (iconElement) {
+          switch (type) {
+            case 'success':
+              iconElement.className = 'notification-icon fas fa-check-circle';
+              break;
+            case 'error':
+              iconElement.className = 'notification-icon fas fa-exclamation-triangle';
+              break;
+            case 'warning':
+              iconElement.className = 'notification-icon fas fa-exclamation-circle';
+              break;
+            default:
+              iconElement.className = 'notification-icon fas fa-info-circle';
+          }
+        }
+        
+        const hideDelay = type === 'error' ? 4000 : 2500;
+        setTimeout(() => {
+          hideNotification();
+        }, hideDelay);
+      } catch (error) {
+        errorHandler.handleError(error, 'Show Notification');
+      }
+    }
+
+    function hideNotification() {
+      try {
+        if (notification) {
+          notification.classList.remove('show');
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Hide Notification');
+      }
+    }
+
+    // Haptic Feedback
+    function hapticFeedback(type = 'light') {
+      try {
+        if ('vibrate' in navigator) {
+          switch (type) {
+            case 'light':
+              navigator.vibrate(8);
+              break;
+            case 'medium':
+              navigator.vibrate(15);
+              break;
+            case 'success':
+              navigator.vibrate([30, 30, 60]);
+              break;
+            case 'error':
+              navigator.vibrate([60, 30, 60, 30, 60]);
+              break;
+            default:
+              navigator.vibrate(10);
+          }
+        }
+      } catch (error) {
+        // Vibração não suportada, ignorar silenciosamente
+      }
+    }
+
+    // PWA Setup - COMPLETO
+    function setupPWA() {
+      try {
+        // Verificar se já está em modo standalone
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+          console.log('Executando como PWA');
+          document.documentElement.classList.add('pwa-mode');
+          return;
+        }
+        
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            // Service Worker inline para funcionar sem arquivo externo
+            const swCode = `
+              const CACHE_NAME = 'caixa-freitas-v8-1';
+              const urlsToCache = ['/'];
+              
+              self.addEventListener('install', event => {
+                event.waitUntil(
+                  caches.open(CACHE_NAME)
+                    .then(cache => cache.addAll(urlsToCache))
+                );
+              });
+              
+              self.addEventListener('fetch', event => {
+                event.respondWith(
+                  caches    // SISTEMA DE TECLADO VIRTUAL - TELA INTEIRA
+    function openKeyboard(target, title) {
+      try {
+        if (!target || !title) {
+          throw new Error('Parâmetros inválidos para abrir teclado');
+        }
+        
+        keyboardTarget = target;
+        keyboardValue = '';
+        
+        if (keyboardTitle) keyboardTitle.textContent = title;
+        if (keyboardDisplay) keyboardDisplay.textContent = '0';
+        
+        if (virtualKeyboard) {
+          virtualKeyboard.classList.add('show');
+        }
+        
+        // Prevenir scroll do body quando teclado estiver aberto
+        document.body.style.overflow = 'hidden';
+        
+      } catch (error) {
+        errorHandler.handleError(error, 'Open Keyboard');
+        showNotification('Erro ao abrir teclado', 'error');
+      }
+    }
+
+    function closeKeyboard() {
+      try {
+        if (virtualKeyboard) virtualKeyboard.classList.remove('show');
+        document.body.style.overflow = '';
+        keyboardTarget = null;
+        keyboardValue = '';
+        editingIndex = null;
+        
+        document.querySelectorAll('.summary-item').forEach(el => {
+          el.classList.remove('editing');
+        });
+      } catch (error) {
+        errorHandler.handleError(error, 'Close Keyboard');
+      }
+    }
+
+    // ENTRADA DE DÍGITOS - VELOCIDADE MÁXIMA
+    function inputDigit(digit) {
+      try {
+        if (!digit || isNaN(digit)) {
+          throw new Error('Dígito inválido');
+        }
+        
+        keyboardValue += digit;
+        updateKeyboardDisplay();
+      } catch (error) {
+        errorHandler.handleError(error, 'Input Digit');
+      }
+    }
+
+    function inputComma() {
+      try {
+        if (!keyboardValue.includes(',') && keyboardValue.length > 0) {
+          keyboardValue += ',';
+          updateKeyboardDisplay();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Input Comma');
+      }
+    }
+
+    function backspace() {
+      try {
+        keyboardValue = keyboardValue.slice(0, -1);
+        updateKeyboardDisplay();
+      } catch (error) {
+        errorHandler.handleError(error, 'Backspace');
+      }
+    }
+
+    function updateKeyboardDisplay() {
+      try {
+        if (keyboardDisplay) {
+          keyboardDisplay.textContent = keyboardValue || '0';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Keyboard Display');
+      }
+    }
+
+    function cancelKeyboard() {
+      closeKeyboard();
+    }
+
+    function confirmKeyboard() {
+      try {
+        const value = parseFloat(keyboardValue.replace(',', '.'));
+        
+        if (isNaN(value) || value <= 0) {
+          showNotification('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        switch (keyboardTarget) {
+          case 'others':
+            addToCart('Outros', value);
+            break;
+            
+          case 'received':
+            if (receivedInput) {
+              receivedInput.value = value.toFixed(2).replace('.', ',');
+              updateChange();
+            }
+            break;
+            
+          case 'edit-quantity':
+            if (editingIndex !== null && cart[editingIndex]) {
+              cart[editingIndex].quantity = Math.max(1, parseInt(keyboardValue));
+              renderCart();
+              updateTotal();
+              saveCart();
+            }
+            break;
+            
+          case 'edit-price':
+            if (editingIndex !== null && cart[editingIndex]) {
+              cart[editingIndex].price = value;
+              renderCart();
+              updateTotal();
+              saveCart();
+            }
+            break;
+            
+          case 'sangria':
+            if (sangriaInput) {
+              sangriaInput.value = `R$ ${value.toFixed(2).replace('.', ',')}`;
+            }
+            break;
+            
+          case 'supplier':
+            if (supplierInput) {
+              supplierInput.value = `R$ ${value.toFixed(2).replace('.', ',')}`;
+            }
+            break;
+        }
+        
+        closeKeyboard();
+        showNotification('Valor confirmado', 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Confirm Keyboard');
+        showNotification('Erro ao processar valor', 'error');
+      }
+    }
+
+    function handleKeyboardShortcut(e) {
+      try {
+        if (e.key >= '0' && e.key <= '9') {
+          e.preventDefault();
+          inputDigit(e.key);
+        } else if (e.key === ',' || e.key === '.') {
+          e.preventDefault();
+          inputComma();
+        } else if (e.key === 'Backspace') {
+          e.preventDefault();
+          backspace();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          confirmKeyboard();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelKeyboard();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Keyboard Shortcut');
+      }
+    }
+
+    // Sangria Functions
+    function openSangria() {
+      try {
+        if (sangriaModal) {
+          sangriaModal.classList.add('show');
+          if (sangriaInput) sangriaInput.value = '';
+          if (sangriaObservation) sangriaObservation.value = '';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Open Sangria');
+        showNotification('Erro ao abrir sangria', 'error');
+      }
+    }
+
+    function closeSangriaModal() {
+      try {
+        if (sangriaModal) sangriaModal.classList.remove('show');
+      } catch (error) {
+        errorHandler.handleError(error, 'Close Sangria Modal');
+      }
+    }
+
+    function processSangria() {
+      try {
+        if (!sangriaInput || !sangriaInput.value) {
+          showNotification('Digite o valor da sangria', 'warning');
+          return;
+        }
+        
+        const amount = parseFloat(sangriaInput.value.replace('R$ ', '').replace(',', '.'));
+        
+        if (isNaN(amount) || amount <= 0) {
+          showNotification('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        const now = new Date();
+        const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+        
+        const sangria = {
+          id: Date.now(),
+          amount: amount,
+          observation: sangriaObservation ? sangriaObservation.value : '',
+          timestamp: now.toISOString(),
+          date: now.toLocaleDateString('pt-BR'),
+          time: now.toLocaleTimeString('pt-BR'),
+          turn: activeTurn
+        };
+        
+        const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+        sangriaHistory.unshift(sangria);
+        localStorage.setItem('sangriaHistory', JSON.stringify(sangriaHistory));
+        
+        closeSangriaModal();
+        hapticFeedback('success');
+        showNotification('Sangria registrada!', 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Process Sangria');
+        showNotification('Erro ao registrar sangria', 'error');
+      }
+    }
+
+    // Supplier Payment Functions
+    function openSupplierPayment() {
+      try {
+        if (supplierModal) {
+          supplierModal.classList.add('show');
+          if (supplierInput) supplierInput.value = '';
+          if (supplierDescription) supplierDescription.value = '';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Open Supplier Payment');
+        showNotification('Erro ao abrir pagamento', 'error');
+      }
+    }
+
+    function closeSupplierModal() {
+      try {
+        if (supplierModal) supplierModal.classList.remove('show');
+      } catch (error) {
+        errorHandler.handleError(error, 'Close Supplier Modal');
+      }
+    }
+
+    function processSupplierPayment() {
+      try {
+        if (!supplierInput || !supplierInput.value) {
+          showNotification('Digite o valor do pagamento', 'warning');
+          return;
+        }
+        
+        if (!supplierDescription || !supplierDescription.value.trim()) {
+          showNotification('Digite a descrição do pagamento', 'warning');
+          return;
+        }
+        
+        const amount = parseFloat(supplierInput.value.replace('R$ ', '').replace(',', '.'));
+        
+        if (isNaN(amount) || amount <= 0) {
+          showNotification('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        const now = new Date();
+        const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+        
+        const supplierPayment = {
+          id: Date.now(),
+          amount: amount,
+          description: supplierDescription.value.trim(),
+          timestamp: now.toISOString(),
+          date: now.toLocaleDateString('pt-BR'),
+          time: now.toLocaleTimeString('pt-BR'),
+          turn: activeTurn
+        };
+        
+        const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+        supplierHistory.unshift(supplierPayment);
+        localStorage.setItem('supplierHistory', JSON.stringify(supplierHistory));
+        
+        closeSupplierModal();
+        hapticFeedback('success');
+        showNotification('Pagamento registrado!', 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Process Supplier Payment');
+        showNotification('Erro ao registrar pagamento', 'error');
+      }
+    }
+
+    // History Functions
+    function openHistory() {
+      try {
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        
+        if (salesHistory.length === 0) {
+          showNotification('Nenhuma venda registrada', 'warning');
+          return;
+        }
+        
+        let historyHTML = `
+          <div class="modal-overlay show" onclick="event.target === this && closeHistoryModal()">
+            <div class="modal" onclick="event.stopPropagation()" style="max-width: 450px;">
+              <div class="modal-header">
+                <h3 class="modal-title">Histórico de Vendas</h3>
+                <button class="modal-close" onclick="closeHistoryModal()">×</button>
+              </div>
+              <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+        `;
+        
+        salesHistory.slice(0, 30).forEach(sale => {
+          historyHTML += `
+            <div class="sale-detail" onclick="toggleSaleDetail(${sale.id})" style="cursor: pointer;">
+              <div class="sale-header">
+                <div>
+                  <div class="sale-id">ID: ${sale.id}</div>
+                  <div class="sale-total">R$ ${sale.total.toFixed(2).replace('.', ',')}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">${sale.time}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">${sale.date}</div>
+                </div>
+              </div>
+              
+              <div class="sale-payment">
+                Pagamento: <span class="payment-badge">${sale.paymentMethod}</span>
+                ${sale.paymentMethod === 'Dinheiro' && sale.change > 0 ? `<br>Troco: R$ ${sale.change.toFixed(2).replace('.', ',')}` : ''}
+              </div>
+              
+              <div id="sale-detail-${sale.id}" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+                <div class="sale-items">
+                  <strong>Itens:</strong>
+                  ${sale.items.map(item => `
+                    <div class="sale-item">
+                      <span>${item.quantity}x ${item.label}</span>
+                      <span>R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  `).join('')}
+                </div>
+                <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    Recebido: R$ ${sale.received.toFixed(2).replace('.', ',')}
+                  </div>
+                  <button class="print-btn" onclick="event.stopPropagation(); printSale(${sale.id})">
+                    <i class="fas fa-print"></i>
+                    Imprimir
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        historyHTML += `
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const historyModal = document.createElement('div');
+        historyModal.innerHTML = historyHTML;
+        historyModal.id = 'historyModal';
+        document.body.appendChild(historyModal);
+      } catch (error) {
+        errorHandler.handleError(error, 'Open History');
+        showNotification('Erro ao carregar histórico', 'error');
+      }
+    }
+
+    function toggleSaleDetail(saleId) {
+      try {
+        const detailDiv = document.getElementById(`sale-detail-${saleId}`);
+        if (detailDiv) {
+          const isVisible = detailDiv.style.display !== 'none';
+          detailDiv.style.display = isVisible ? 'none' : 'block';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Toggle Sale Detail');
+      }
+    }
+
+    function printSale(saleId) {
+      try {
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        const sale = salesHistory.find(s => s.id === saleId);
+        
+        if (!sale) {
+          showNotification('Venda não encontrada', 'error');
+          return;
+        }
+        
+        const printContent = `
+          <div style="font-family: monospace; max-width: 280px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 15px;">
+              <h2>CAIXA FREITAS</h2>
+              <p>Comprovante de Venda</p>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <p><strong>ID:</strong> ${sale.id}</p>
+              <p><strong>Data:</strong> ${sale.date} ${sale.time}</p>
+              <p><strong>Pagamento:</strong> ${sale.paymentMethod}</p>
+            </div>
+            
+            <div style="border-top: 1px dashed #000; margin: 12px 0; padding-top: 8px;">
+              <h3>ITENS:</h3>
+              ${sale.items.map(item => `
+                <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                  <span>${item.quantity}x ${item.label}</span>
+                  <span>R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</span>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div style="border-top: 1px dashed #000; margin: 12px 0; padding-top: 8px;">
+              <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold;">
+                <span>TOTAL:</span>
+                <span>R$ ${sale.total.toFixed(2).replace('.', ',')}</span>
+              </div>
+              
+              ${sale.paymentMethod === 'Dinheiro' ? `
+                <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                  <span>Recebido:</span>
+                  <span>R$ ${sale.received.toFixed(2).replace('.', ',')}</span>
+                </div>
+                ${sale.change > 0 ? `
+                  <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                    <span>Troco:</span>
+                    <span>R$ ${sale.change.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                ` : ''}
+              ` : ''}
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px; font-size: 11px;">
+              <p>Obrigado pela preferência!</p>
+            </div>
+          </div>
+        `;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Comprovante - ${sale.id}</title>
+            </head>
+            <body onload="window.print(); window.close();">
+              ${printContent}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      } catch (error) {
+        errorHandler.handleError(error, 'Print Sale');
+        showNotification('Erro ao imprimir', 'error');
+      }
+    }
+
+    function closeHistoryModal() {
+      try {
+        const historyModal = document.getElementById('historyModal');
+        if (historyModal) {
+          historyModal.remove();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Close History Modal');
+      }
+    }
+
+    function openProHistory() {
+      try {
+        if (passwordModal) {
+          passwordModal.classList.add('show');
+          if (passwordInput) {
+            passwordInput.value = '';
+            setTimeout(() => passwordInput.focus(), 100);
+          }
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Open Pro History');
+        showNotification('Erro ao abrir histórico pro', 'error');
+      }
+    }
+
+    function closePasswordModal() {
+      try {
+        if (passwordModal) passwordModal.classList.remove('show');
+      } catch (error) {
+        errorHandler.handleError(error, 'Close Password Modal');
+      }
+    }
+
+    function checkPassword() {
+      try {
+        if (!passwordInput) return;
+        
+        const password = passwordInput.value.trim();
+        const correctPassword = '2201';
+        
+        if (password === correctPassword) {
+          closePasswordModal();
+          showProHistoryModal();
+        } else {
+          showNotification('Senha incorreta', 'error');
+          passwordInput.value = '';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Check Password');
+        showNotification('Erro ao verificar senha', 'error');
+      }
+    }
+
+    // NOVO: Filtros de data e turno
+    function getDateRange(filter, startDate = '', endDate = '') {
+      const today = new Date();
+      let start, end;
+      
+      switch (filter) {
+        case 'today':
+          start = new Date(today);
+          end = new Date(today);
+          break;
+        case 'week':
+          start = new Date(today);
+          start.setDate(today.getDate() - today.getDay());
+          end = new Date(today);
+          break;
+        case 'month':
+          start = new Date(today.getFullYear(), today.getMonth(), 1);
+          end = new Date(today);
+          break;
+        case 'custom':
+          start = startDate ? new Date(startDate) : new Date(today);
+          end = endDate ? new Date(endDate) : new Date(today);
+          break;
+        default:
+          start = new Date(today);
+          end = new Date(today);
+      }
+      
+      return { start, end };
+    }
+
+    function filterDataByDateAndTurn(data, dateFilter, turnFilter, startDate = '', endDate = '') {
+      try {
+        const { start, end } = getDateRange(dateFilter, startDate, endDate);
+        
+        return data.filter(item => {
+          const itemDate = new Date(item.timestamp);
+          const isInDateRange = itemDate >= start && itemDate <= end;
+          
+          if (turnFilter === 'all') {
+            return isInDateRange;
+          }
+          
+          return isInDateRange && item.turn && item.turn.type === turnFilter;
+        });
+      } catch (error) {
+        errorHandler.handleError(error, 'Filter Data');
+        return [];
+      }
+    }
+
+    // Pro History Modal com Filtros Avançados
+    function showProHistoryModal() {
+      try {
+        let proHTML = `
+          <div class="modal-overlay show" onclick="event.target === this && closeProHistoryModal()">
+            <div class="modal" onclick="event.stopPropagation()" style="max-width: 500px; max-height: 90vh;">
+              <div class="modal-header">
+                <h3 class="modal-title">Relatório Profissional</h3>
+                <button class="modal-close" onclick="closeProHistoryModal()">×</button>
+              </div>
+              <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                
+                <!-- Filtros de Turno -->
+                <div class="turn-filter-buttons">
+                  <button class="turn-filter-btn active" onclick="setTurnFilter('all')" id="filter-all">
+                    <i class="fas fa-globe"></i>
+                    Todos
+                  </button>
+                  <button class="turn-filter-btn" onclick="setTurnFilter('manhã')" id="filter-manha">
+                    <i class="fas fa-sun"></i>
+                    Manhã
+                  </button>
+                  <button class="turn-filter-btn" onclick="setTurnFilter('tarde')" id="filter-tarde">
+                    <i class="fas fa-moon"></i>
+                    Tarde
+                  </button>
+                </div>
+                
+                <!-- Filtros de Data -->
+                <div class="filter-controls">
+                  <div class="filter-buttons" style="margin-bottom: 10px;">
+                    <button class="filter-btn active" onclick="setDateFilter('today')" id="date-today">Hoje</button>
+                    <button class="filter-btn" onclick="setDateFilter('week')" id="date-week">Semana</button>
+                    <button class="filter-btn" onclick="setDateFilter('month')" id="date-month">Mês</button>
+                    <button class="filter-btn" onclick="setDateFilter('custom')" id="date-custom">Personalizado</button>
+                  </div>
+                  
+                  <div class="date-range" id="customDateRange" style="display: none;">
+                    <input type="date" class="date-input" id="startDate" onchange="updateCustomFilter()">
+                    <input type="date" class="date-input" id="endDate" onchange="updateCustomFilter()">
+                  </div>
+                </div>
+                
+                <!-- Financial Summary -->
+                <div id="financialSummary">
+                  ${generateAdvancedFinancialSummary()}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
+                  <button class="secondary-btn clear-btn" onclick="clearAllData()" style="font-size: 0.8rem; padding: 10px;">
+                    <i class="fas fa-trash"></i>
+                    Limpar Dados
+                  </button>
+                  <button class="secondary-btn" onclick="exportAdvancedReport()" style="font-size: 0.8rem; padding: 10px; background: #607D8B;">
+                    <i class="fas fa-share"></i>
+                    Exportar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const proModal = document.createElement('div');
+        proModal.innerHTML = proHTML;
+        proModal.id = 'proHistoryModal';
+        document.body.appendChild(proModal);
+        
+        // Definir datas padrão
+        const today = new Date().toISOString().split('T')[0];
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        if (startDateInput) startDateInput.value = today;
+        if (endDateInput) endDateInput.value = today;
+        
+      } catch (error) {
+        errorHandler.handleError(error, 'Show Pro History Modal');
+        showNotification('Erro ao carregar relatório', 'error');
+      }
+    }
+
+    function setTurnFilter(filter) {
+      try {
+        currentTurnFilter = filter;
+        
+        // Atualizar botões
+        document.querySelectorAll('.turn-filter-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        const activeBtn = document.getElementById(`filter-${filter}`);
+        if (activeBtn) activeBtn.classList.add('active');
+        
+        updateFinancialSummary();
+      } catch (error) {
+        errorHandler.handleError(error, 'Set Turn Filter');
+      }
+    }
+
+    function setDateFilter(filter) {
+      try {
+        currentDateFilter = filter;
+        
+        // Atualizar botões
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        const activeBtn = document.getElementById(`date-${filter}`);
+        if (activeBtn) activeBtn.classList.add('active');
+        
+        // Mostrar/esconder range personalizado
+        const customRange = document.getElementById('customDateRange');
+        if (customRange) {
+          customRange.style.display = filter === 'custom' ? 'grid' : 'none';
+        }
+        
+        updateFinancialSummary();
+      } catch (error) {
+        errorHandler.handleError(error, 'Set Date Filter');
+      }
+    }
+
+    function updateCustomFilter() {
+      try {
+        const startDate = document.getElementById('startDate')?.value;
+        const endDate = document.getElementById('endDate')?.value;
+        
+        if (startDate && endDate) {
+          customStartDate = startDate;
+          customEndDate = endDate;
+          updateFinancialSummary();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Custom Filter');
+      }
+    }
+
+    function generateAdvancedFinancialSummary() {
+      try {
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+        const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+        
+        const filteredSales = filterDataByDateAndTurn(salesHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        const filteredSangrias = filterDataByDateAndTurn(sangriaHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        const filteredSuppliers = filterDataByDateAndTurn(supplierHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        
+        const cashSales = filteredSales.filter(sale => sale.paymentMethod === 'Dinheiro');
+        const cardSales = filteredSales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+        
+        const totalCash = cashSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalCard = cardSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalSangrias = filteredSangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+        const totalSuppliers = filteredSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+        const totalSales = totalCash + totalCard;
+        
+        const periodText = getPeriodText();
+        
+        return `
+          <h4 style="margin-bottom: 10px; color: var(--primary-color); text-align: center;">
+            Resumo ${periodText}
+            ${currentTurnFilter !== 'all' ? ` - Turno da ${currentTurnFilter.charAt(0).toUpperCase() + currentTurnFilter.slice(1)}` : ''}
+          </h4>
+          <div class="financial-summary">
+            <div class="summary-card">
+              <div class="summary-label">Vendas Dinheiro</div>
+              <div class="summary-value cash-value">R$ ${totalCash.toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${cashSales.length} vendas</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Vendas Cartão/PIX</div>
+              <div class="summary-value card-value">R$ ${totalCard.toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${cardSales.length} vendas</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Total Vendas</div>
+              <div class="summary-value" style="color: var(--primary-color);">R$ ${totalSales.toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${filteredSales.length} vendas</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Sangrias</div>
+              <div class="summary-value sangria-value">R$ ${totalSangrias.toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${filteredSangrias.length} retiradas</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Pagto Fornecedores</div>
+              <div class="summary-value supplier-value">R$ ${totalSuppliers.toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${filteredSuppliers.length} pagamentos</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Saldo Final</div>
+              <div class="summary-value" style="color: var(--success-color); font-size: 1.3rem;">R$ ${(totalSales - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Caixa: R$ ${(totalCash - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}</div>
+            </div>
+          </div>
+          
+          <!-- Detalhamento das Sangrias -->
+          ${filteredSangrias.length > 0 ? `
+            <div style="margin-top: 15px;">
+              <h5 style="color: var(--error-color); margin-bottom: 8px;">
+                <i class="fas fa-money-bill-wave"></i> Detalhes das Sangrias
+              </h5>
+              <div style="max-height: 100px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; background: #fdf2f2;">
+                ${filteredSangrias.map(sangria => `
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 0.8rem;">
+                    <span>${sangria.date} ${sangria.time}</span>
+                    <span style="font-weight: bold; color: var(--error-color);">R$ ${sangria.amount.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                  ${sangria.observation ? `<div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 6px;">${sangria.observation}</div>` : ''}
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Detalhamento dos Pagamentos a Fornecedores -->
+          ${filteredSuppliers.length > 0 ? `
+            <div style="margin-top: 15px;">
+              <h5 style="color: var(--primary-color); margin-bottom: 8px;">
+                <i class="fas fa-hand-holding-usd"></i> Pagamentos a Fornecedores
+              </h5>
+              <div style="max-height: 100px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; background: #f0f9f0;">
+                ${filteredSuppliers.map(supplier => `
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 0.8rem;">
+                    <span>${supplier.date} ${supplier.time}</span>
+                    <span style="font-weight: bold; color: var(--primary-color);">R$ ${supplier.amount.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                  <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 6px;">${supplier.description}</div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        `;
+      } catch (error) {
+        errorHandler.handleError(error, 'Generate Advanced Financial Summary');
+        return '<p>Erro ao carregar resumo financeiro</p>';
+      }
+    }
+
+    function getPeriodText() {
+      switch (currentDateFilter) {
+        case 'today':
+          return 'de Hoje';
+        case 'week':
+          return 'da Semana';
+        case 'month':
+          return 'do Mês';
+        case 'custom':
+          return `de ${customStartDate} a ${customEndDate}`;
+        default:
+          return 'do Período';
+      }
+    }
+
+    function updateFinancialSummary() {
+      try {
+        const summaryDiv = document.getElementById('financialSummary');
+        if (summaryDiv) {
+          summaryDiv.innerHTML = generateAdvancedFinancialSummary();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Financial Summary');
+      }
+    }
+
+    function exportAdvancedReport() {
+      try {
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+        const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+        
+        const filteredSales = filterDataByDateAndTurn(salesHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        const filteredSangrias = filterDataByDateAndTurn(sangriaHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        const filteredSuppliers = filterDataByDateAndTurn(supplierHistory, currentDateFilter, currentTurnFilter, customStartDate, customEndDate);
+        
+        const cashSales = filteredSales.filter(sale => sale.paymentMethod === 'Dinheiro');
+        const cardSales = filteredSales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+        
+        const totalCash = cashSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalCard = cardSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalSangrias = filteredSangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+        const totalSuppliers = filteredSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+        
+        const periodText = getPeriodText();
+        const turnText = currentTurnFilter !== 'all' ? ` - Turno da ${currentTurnFilter.charAt(0).toUpperCase() + currentTurnFilter.slice(1)}` : '';
+        
+        let report = `🥖 *RELATÓRIO CAIXA FREITAS*
+📊 *Relatório ${periodText}${turnText}*
+📅 Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}
+
+💰 *RESUMO FINANCEIRO*
+💵 Vendas Dinheiro: R$ ${totalCash.toFixed(2).replace('.', ',')} (${cashSales.length} vendas)
+💳 Vendas Cartão/PIX: R$ ${totalCard.toFixed(2).replace('.', ',')} (${cardSales.length} vendas)
+📊 Total Vendas: R$ ${(totalCash + totalCard).toFixed(2).replace('.', ',')} (${filteredSales.length} vendas)
+🔴 Sangrias: R$ ${totalSangrias.toFixed(2).replace('.', ',')} (${filteredSangrias.length} retiradas)
+🏪 Pagto Fornecedores: R$ ${totalSuppliers.toFixed(2).replace('.', ',')} (${filteredSuppliers.length} pagamentos)
+💰 Saldo Final: R$ ${(totalCash + totalCard - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}
+💸 Caixa Final: R$ ${(totalCash - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}`;
+
+        // Adicionar detalhes das sangrias se houver
+        if (filteredSangrias.length > 0) {
+          report += `\n\n🔴 *DETALHES DAS SANGRIAS:*`;
+          filteredSangrias.forEach(sangria => {
+            report += `\n• ${sangria.date} ${sangria.time} - R$ ${sangria.amount.toFixed(2).replace('.', ',')}`;
+            if (sangria.observation) {
+              report += ` (${sangria.observation})`;
+            }
+          });
+        }
+
+        // Adicionar detalhes dos pagamentos a fornecedores se houver
+        if (filteredSuppliers.length > 0) {
+          report += `\n\n🏪 *PAGAMENTOS A FORNECEDORES:*`;
+          filteredSuppliers.forEach(supplier => {
+            report += `\n• ${supplier.date} ${supplier.time} - R$ ${supplier.amount.toFixed(2).replace('.', ',')}`;
+            report += `\n  ${supplier.description}`;
+          });
+        }
+
+        report += `\n\n_Relatório gerado pelo Caixa Freitas v8.1 PWA_`;
+
+        sendToWhatsApp(report);
+      } catch (error) {
+        errorHandler.handleError(error, 'Export Advanced Report');
+        showNotification('Erro ao gerar relatório', 'error');
+      }
+    }
+
+    function closeProHistoryModal() {
+      try {
+        const proModal = document.getElementById('proHistoryModal');
+        if (proModal) {
+          proModal.remove();
+        }
+        // Reset filters
+        currentTurnFilter = 'all';
+        currentDateFilter = 'today';
+        customStartDate = '';
+        customEndDate = '';
+      } catch (error) {
+        errorHandler.handleError(error, 'Close Pro History Modal');
+      }
+    }
+
+    function clearAllData() {
+      if (confirm('ATENÇÃO: Isso irá apagar TODOS os dados do sistema. Esta ação não pode ser desfeita. Deseja continuar?')) {
+        try {
+          localStorage.removeItem('salesHistory');
+          localStorage.removeItem('sangriaHistory');
+          localStorage.removeItem('supplierHistory');
+          localStorage.removeItem('turnHistory');
+          localStorage.removeItem('currentCart');
+          
+          cart = [];
+          total = 0;
+          paymentMethod = '';
+          renderCart();
+          updateTotal();
+          
+          closeProHistoryModal();
+          showNotification('Todos os dados foram limpos', 'success');
+        } catch (error) {
+          errorHandler.handleError(error, 'Clear All Data');
+          showNotification('Erro ao limpar dados', 'error');
+        }
+      }
+    }    // Setup Event Listeners - OTIMIZADO PARA VELOCIDADE MÁXIMA
+    function setupEventListeners() {
+      try {
+        // Product buttons - RESPOSTA INSTANTÂNEA
+        document.querySelectorAll('.product-btn:not(.others-btn)').forEach(btn => {
+          // Remover todos os delays - resposta imediata
+          btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            const label = btn.dataset.label;
+            const price = parseFloat(btn.dataset.price);
+            
+            if (label && !isNaN(price)) {
+              addToCart(label, price);
+              
+              // Feedback visual instantâneo
+              btn.style.transform = 'scale(0.95)';
+              hapticFeedback('light');
+            }
+          }, { passive: false });
+          
+          btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            btn.style.transform = '';
+          }, { passive: false });
+          
+          // Fallback para clique
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const label = btn.dataset.label;
+            const price = parse<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Super Caixa Freitas</title>
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ2FpeGEgRnJlaXRhcyIsInNob3J0X25hbWUiOiJGcmVpdGFzIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiM1ODAwMjEiLCJ0aGVtZV9jb2xvciI6IiM1ODAwMjEiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRreUlpQm9aV2xuYUhROUlqRTVNaUlnZG1sbGQwSnZlRDBpTUNBd0lERTVNaUF4T1RJaUlHWnBiR3c5SW01dmJtVWlJSGh0Ykc1elBTSm9kSFJ3T2k4dmQzZDNMbmN6TG05eVp5OHlNREF3TDNOMlp5SStDbkpsWTNRZ2QybGtkR2c5SWpFNU1pSWdhR1ZwWjJoMFBTSXhPVElpSUhKNFBTSXlOQ0lnWm1sc2JEMGlJelU0TURBNU1TSXZQZ3B3ZEdWNGRDQjRQU0k1TmlJZ2VUMGlNVEl3SWlCbWIyNTBMV1poYldsc2VUMGlRWEpwWVd3c0lITmhibk10YzJWeWFXWWlJR1p2Ym5RdGMybDZaVDBpTXpZaUlHWnZiblF0ZDJWcFoyaDBQU0ppYjJ4a0lpQm1hV3hzUFNKM2FHbDBaU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJK1Jqd3ZkR1Y0ZEQ0S1BDOXpkbWMrQ2c9PSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkY8L3RleHQ+Cjwvc3ZnPgo=">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkY8L3RleHQ+Cjwvc3ZnPgo=">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-color: #4a1a2e;
+      --primary-dark: #2d0f1c;
+      --secondary-color: #43A047;
+      --error-color: #E53935;
+      --warning-color: #FF9800;
+      --surface-color: #FFFFFF;
+      --background-color: #f8f9fa;
+      --text-primary: #2c3e50;
+      --text-secondary: #6c757d;
+      --border-color: #dee2e6;
+      --success-color: #28a745;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+      --radius: 10px;
+      --radius-sm: 6px;
+      --spacing: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      -webkit-text-size-adjust: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* CONTAINER PRINCIPAL - ALTURA FIXA PARA OCUPAR TODA A TELA */
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-logo {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* HEADER COMPACTO - ALTURA FIXA */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 8px var(--spacing);
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(74, 26, 46, 0.2);
+      border-radius: 0 0 12px 12px;
+      flex-shrink: 0;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      letter-spacing: -0.02em;
+    }
+
+    .turno-info {
+      font-size: 0.7rem;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* CONTAINER DE CONTEÚDO - OCUPA RESTO DA TELA */
+    .content-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* SEÇÃO DE PRODUTOS - ALTURA FIXA */
+    .products-section {
+      background: white;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 6px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+    }
+
+    .product-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      box-shadow: 0 2px 8px rgba(74, 26, 46, 0.2);
+      position: relative;
+      overflow: hidden;
+      min-height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .product-btn:active {
+      transform: scale(0.95);
+    }
+
+    .product-btn .price {
+      font-size: 0.6rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    .others-btn {
+      background: linear-gradient(135deg, var(--warning-color), #F57C00);
+    }
+
+    .others-btn::before {
+      content: '+';
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* SEÇÃO RESUMO - OCUPA ESPAÇO RESTANTE */
+    .summary-section {
+      background: white;
+      border-radius: 10px;
+      padding: 8px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* LISTA DE RESUMO - SCROLLABLE COM ALTURA MÁXIMA DE 3 ITENS */
+    .summary-list {
+      overflow-y: auto;
+      margin-bottom: 6px;
+      padding-right: 4px;
+      max-height: 150px; /* Altura para aproximadamente 3 itens */
+      min-height: 50px;
+    }
+
+    .summary-list::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .summary-list::-webkit-scrollbar-track {
+      background: var(--border-color);
+      border-radius: 2px;
+    }
+
+    .summary-list::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      margin-bottom: 3px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+      min-height: 45px;
+    }
+
+    .summary-item:active {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    .item-label {
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 0.75rem;
+    }
+
+    .item-quantity {
+      font-size: 0.6rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--primary-color);
+      font-size: 0.8rem;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--error-color);
+      padding: 4px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .delete-btn:active {
+      background: #ffebee;
+      transform: scale(1.1);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 15px 10px;
+      color: var(--text-secondary);
+    }
+
+    .empty-cart i {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      opacity: 0.4;
+    }
+
+    /* SEÇÃO DE TOTAL E CONTROLES - ALTURA FIXA */
+    .controls-section {
+      flex-shrink: 0;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 6px;
+    }
+
+    .total-amount {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    /* MÉTODOS DE PAGAMENTO */
+    .payment-section {
+      margin-bottom: 6px;
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .payment-btn {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      color: var(--text-primary);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.7rem;
+      min-height: 35px;
+    }
+
+    .payment-btn.selected {
+      background: linear-gradient(135deg, var(--success-color), #218838);
+      color: white;
+      border-color: var(--success-color);
+      transform: scale(1.02);
+    }
+
+    .payment-btn:active:not(.selected) {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    /* VALOR RECEBIDO */
+    .received-section {
+      margin-bottom: 6px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .received-section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .received-input {
+      width: 100%;
+      padding: 6px;
+      font-size: 0.9rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      text-align: center;
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      min-height: 35px;
+    }
+
+    .received-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(74, 26, 46, 0.1);
+    }
+
+    .received-input:active {
+      transform: scale(0.98);
+    }
+
+    .change-amount {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--success-color);
+      margin-top: 4px;
+    }
+
+    /* BOTÕES DE AÇÃO REORGANIZADOS */
+    .main-action-button {
+      margin-bottom: 6px;
+    }
+
+    .next-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow-hover);
+      background: linear-gradient(135deg, var(--success-color), #218838);
+      color: white;
+      min-height: 50px;
+    }
+
+    .next-btn:active {
+      transform: scale(0.98);
+    }
+
+    .next-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .secondary-btn {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      min-height: 40px;
+    }
+
+    .clear-btn {
+      background: linear-gradient(135deg, var(--error-color), #d32f2f);
+      color: white;
+    }
+
+    .payment-supplier-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+    }
+
+    .secondary-btn:active {
+      transform: scale(0.95);
+    }
+
+    .bottom-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--text-secondary), #424242);
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.7rem;
+      min-height: 35px;
+    }
+
+    .bottom-btn.pro {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    }
+
+    .bottom-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* TECLADO VIRTUAL - TELA INTEIRA */
+    .virtual-keyboard {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      z-index: 15000;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 15px;
+    }
+
+    .virtual-keyboard.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .keyboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-shrink: 0;
+      padding-top: 10px;
+    }
+
+    .keyboard-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+    }
+
+    .keyboard-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+
+    .keyboard-close:active {
+      background: var(--border-color);
+      transform: scale(0.9);
+    }
+
+    .keyboard-display {
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      padding: 25px;
+      border-radius: 15px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+      border: 3px solid #f9a825;
+      letter-spacing: 2px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .keyboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .keyboard-btn {
+      font-size: 2rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 15px;
+      background: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      user-select: none;
+      box-shadow: 0 4px 12px rgba(74, 26, 46, 0.3);
+      min-height: 70px;
+    }
+
+    .keyboard-btn:active {
+      background: var(--primary-dark);
+      transform: scale(0.95);
+    }
+
+    .keyboard-actions {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 15px;
+      flex-shrink: 0;
+    }
+
+    .keyboard-cancel {
+      background: linear-gradient(135deg, var(--error-color), #d32f2f);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      font-size: 1.1rem;
+      min-height: 60px;
+    }
+
+    .keyboard-confirm {
+      background: linear-gradient(135deg, var(--success-color), #218838);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      font-size: 1.1rem;
+      min-height: 60px;
+    }
+
+    .keyboard-cancel:active,
+    .keyboard-confirm:active {
+      transform: scale(0.95);
+    }
+
+    /* Turn Selection */
+    .turn-selection {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      color: white;
+      padding: 20px;
+    }
+
+    .turn-logo {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .turn-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .turn-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .turn-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .turn-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 150px;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    .turn-btn:active {
+      background: rgba(255,255,255,0.3);
+      transform: scale(0.95);
+    }
+
+    .turn-emoji {
+      font-size: 1.5rem;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.8);
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:active {
+      background: var(--border-color);
+      transform: scale(0.9);
+    }
+
+    /* Password Input */
+    .password-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.2rem;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(74, 26, 46, 0.1);
+    }
+
+    /* Supplier Description Textarea */
+    .supplier-description {
+      width: 100%;
+      padding: 12px;
+      font-size: 0.9rem;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      resize: none;
+      height: 60px;
+      font-family: inherit;
+      margin-bottom: 15px;
+    }
+
+    .supplier-description:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(74, 26, 46, 0.1);
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 20000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 250px;
+      max-width: 90vw;
+      opacity: 0;
+      transform: translateX(-50%) translateY(-30px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification.success {
+      border-left: 3px solid var(--success-color);
+      background: #f0f9f0;
+    }
+
+    .notification.error {
+      border-left: 3px solid var(--error-color);
+      background: #fdf2f2;
+    }
+
+    .notification.warning {
+      border-left: 3px solid var(--warning-color);
+      background: #fffbf0;
+    }
+
+    .notification-icon {
+      font-size: 1.2rem;
+    }
+
+    .notification.success .notification-icon {
+      color: var(--success-color);
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error-color);
+    }
+
+    .notification.warning .notification-icon {
+      color: var(--warning-color);
+    }
+
+    .notification-message {
+      flex: 1;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .notification-close:active {
+      background: var(--border-color);
+      transform: scale(0.9);
+    }
+
+    /* Sale Detail Styles */
+    .sale-detail {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      box-shadow: var(--shadow);
+    }
+
+    .sale-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sale-id {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .sale-total {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .sale-items {
+      margin-bottom: 8px;
+    }
+
+    .sale-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+      font-size: 0.8rem;
+    }
+
+    .sale-payment {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 3px;
+    }
+
+    .sale-payment .payment-badge {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      margin-left: 6px;
+    }
+
+    /* Filter Controls */
+    .filter-controls {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .filter-input {
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .filter-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 6px;
+    }
+
+    .filter-btn {
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      background: white;
+      color: var(--text-primary);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .filter-btn:active:not(.active) {
+      background: var(--background-color);
+    }
+
+    /* Financial Summary */
+    .financial-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 3px;
+    }
+
+    .summary-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .cash-value {
+      color: var(--success-color);
+    }
+
+    .card-value {
+      color: #2196F3;
+    }
+
+    .sangria-value {
+      color: var(--error-color);
+    }
+
+    .supplier-value {
+      color: var(--primary-color);
+    }
+
+    /* Print Button */
+    .print-btn {
+      background: #607D8B;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .print-btn:active {
+      background: #455A64;
+      transform: scale(0.95);
+    }
+
+    /* Turn Filter Buttons */
+    .turn-filter-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .turn-filter-btn {
+      padding: 10px;
+      border: 2px solid var(--border-color);
+      background: white;
+      color: var(--text-primary);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .turn-filter-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      transform: scale(1.02);
+    }
+
+    .turn-filter-btn:active:not(.active) {
+      background: var(--background-color);
+      border-color: var(--primary-color);
+      transform: scale(0.98);
+    }
+
+    /* Date Range Inputs */
+    .date-range {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .date-input {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .date-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    /* PWA Styles */
+    @media (display-mode: standalone) {
+      .header {
+        padding-top: max(8px, env(safe-area-inset-top));
+      }
+      
+      .virtual-keyboard {
+        padding-top: max(15px, env(safe-area-inset-top));
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+    // Setup Event Listeners - OTIMIZADO PARA VELOCIDADE MÁXIMA
+    function setupEventListeners() {
+      try {
+        // Product buttons - RESPOSTA INSTANTÂNEA
+        document.querySelectorAll('.product-btn:not(.others-btn)').forEach(btn => {
+          // Remover todos os delays - resposta imediata
+          btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            const label = btn.dataset.label;
+            const price = parseFloat(btn.dataset.price);
+            
+            if (label && !isNaN(price)) {
+              addToCart(label, price);
+              
+              // Feedback visual instantâneo
+              btn.style.transform = 'scale(0.95)';
+              hapticFeedback('light');
+            }
+          }, { passive: false });
+          
+          btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            btn.style.transform = '';
+          }, { passive: false });
+          
+          // Fallback para clique
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const label = btn.dataset.label;
+            const price = parseFloat(btn.dataset.price);
+            
+            if (label && !isNaN(price)) {
+              addToCart(label, price);
+              hapticFeedback('light');
+            }
+          });
+        });
+
+        // Others button
+        const othersBtn = document.getElementById('othersBtn');
+        if (othersBtn) {
+          othersBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            openKeyboard('others', 'Digite o preço do produto');
+          }, { passive: false });
+          
+          othersBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openKeyboard('others', 'Digite o preço do produto');
+          });
+        }
+
+        // Payment buttons
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+          btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            selectPaymentMethod(btn.dataset.method);
+          }, { passive: false });
+          
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            selectPaymentMethod(btn.dataset.method);
+          });
+        });
+
+        // Received input
+        if (receivedInput) {
+          receivedInput.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (paymentMethod === 'Dinheiro') {
+              openKeyboard('received', 'Digite o valor recebido');
+            }
+          }, { passive: false });
+          
+          receivedInput.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (paymentMethod === 'Dinheiro') {
+              openKeyboard('received', 'Digite o valor recebido');
+            }
+          });
+        }
+
+        // Keyboard Event Listeners - VELOCIDADE MÁXIMA SEM DELAYS
+        document.querySelectorAll('.keyboard-btn[data-digit]').forEach(btn => {
+          btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            const digit = btn.dataset.digit;
+            inputDigit(digit);
+            
+            // Feedback visual instantâneo
+            btn.style.transform = 'scale(0.95)';
+            btn.style.background = 'var(--primary-dark)';
+            
+            hapticFeedback('light');
+          }, { passive: false });
+          
+          btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            btn.style.transform = '';
+            btn.style.background = 'var(--primary-color)';
+          }, { passive: false });
+          
+          // Fallback para clique
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const digit = btn.dataset.digit;
+            inputDigit(digit);
+            hapticFeedback('light');
+          });
+        });
+
+        // Comma button
+        const commaBtn = document.getElementById('commaBtn');
+        if (commaBtn) {
+          commaBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            inputComma();
+          }, { passive: false });
+          
+          commaBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            inputComma();
+          });
+        }
+
+        // Backspace button
+        const backspaceBtn = document.getElementById('backspaceBtn');
+        if (backspaceBtn) {
+          backspaceBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            backspace();
+          }, { passive: false });
+          
+          backspaceBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            backspace();
+          });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          if (virtualKeyboard && virtualKeyboard.classList.contains('show')) {
+            handleKeyboardShortcut(e);
+          }
+        });
+
+        // Password input enter key
+        if (passwordInput) {
+          passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              checkPassword();
+            }
+          });
+        }
+
+        // Modal click outside to close
+        document.addEventListener('click', (e) => {
+          if (e.target.classList.contains('modal-overlay')) {
+            closePasswordModal();
+            closeSangriaModal();
+            closeSupplierModal();
+          }
+        });
+
+        // Sangria e Supplier inputs para abrir teclado
+        setTimeout(() => {
+          if (sangriaInput) {
+            sangriaInput.addEventListener('click', () => {
+              openKeyboard('sangria', 'Digite o valor da sangria');
+            });
+          }
+          
+          if (supplierInput) {
+            supplierInput.addEventListener('click', () => {
+              openKeyboard('supplier', 'Digite o valor do pagamento');
+            });
+          }
+        }, 100);
+
+      } catch (error) {
+        errorHandler.handleError(error, 'Event Listeners Setup');
+      }
+    }
+
+    // Add to Cart - NOVO ITEM NO TOPO
+    function addToCart(label, price, quantity = 1) {
+      try {
+        if (!label || isNaN(price) || price <= 0) {
+          throw new Error('Parâmetros inválidos para adicionar ao carrinho');
+        }
+        
+        const existingItem = cart.find(item => item.label === label && item.price === price);
+        
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          // ADICIONAR NO INÍCIO DO ARRAY (TOPO DA LISTA)
+          cart.unshift({ label, price, quantity });
+        }
+        
+        // Renderização instantânea
+        renderCart();
+        updateTotal();
+        saveCart();
+        
+        hapticFeedback('light');
+      } catch (error) {
+        errorHandler.handleError(error, 'Add to Cart');
+        showNotification('Erro ao adicionar item', 'error');
+      }
+    }
+
+    // Remove from Cart
+    function removeFromCart(index) {
+      try {
+        if (index < 0 || index >= cart.length) {
+          throw new Error('Índice inválido para remoção');
+        }
+        
+        const item = cart[index];
+        if (item) {
+          cart.splice(index, 1);
+          renderCart();
+          updateTotal();
+          saveCart();
+          hapticFeedback('medium');
+          showNotification(`${item.label} removido`, 'success');
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Remove from Cart');
+        showNotification('Erro ao remover item', 'error');
+      }
+    }
+
+    // Edit Item
+    function editItem(index) {
+      try {
+        if (index < 0 || index >= cart.length) {
+          throw new Error('Índice inválido para edição');
+        }
+        
+        editingIndex = index;
+        const item = cart[index];
+        
+        if (!item) return;
+        
+        document.querySelectorAll('.summary-item').forEach((el, i) => {
+          el.classList.toggle('editing', i === index);
+        });
+        
+        if (item.label.toLowerCase().includes('outros')) {
+          openKeyboard('edit-price', `Editar preço: ${item.label}`);
+        } else {
+          openKeyboard('edit-quantity', `Editar quantidade: ${item.label}`);
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Edit Item');
+        showNotification('Erro ao editar item', 'error');
+      }
+    }
+
+    // Render Cart
+    function renderCart() {
+      try {
+        if (!summaryList) {
+          throw new Error('Elemento summaryList não encontrado');
+        }
+        
+        if (cart.length === 0) {
+          summaryList.innerHTML = `
+            <div class="empty-cart animate-fade-in">
+              <i class="fas fa-shopping-cart"></i>
+              <p>Nenhum item adicionado</p>
+            </div>
+          `;
+          return;
+        }
+
+        summaryList.innerHTML = cart.map((item, index) => `
+          <div class="summary-item animate-slide-left" onclick="editItem(${index})">
+            <div class="item-label">
+              <span>${item.label}</span>
+              <span class="item-quantity">${item.quantity}x R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="item-price">R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</div>
+            <button class="delete-btn" onclick="event.stopPropagation(); removeFromCart(${index})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `).join('');
+      } catch (error) {
+        errorHandler.handleError(error, 'Render Cart');
+      }
+    }
+
+    // Update Total
+    function updateTotal() {
+      try {
+        total = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        
+        if (totalAmount) {
+          totalAmount.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        } else {
+          throw new Error('Elemento totalAmount não encontrado');
+        }
+        
+        if (paymentMethod === 'Dinheiro' && receivedInput && receivedInput.value) {
+          updateChange();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Total');
+      }
+    }
+
+    // Select Payment Method
+    function selectPaymentMethod(method) {
+      try {
+        if (!method || (method !== 'Dinheiro' && method !== 'Cartão/PIX')) {
+          throw new Error('Método de pagamento inválido');
+        }
+        
+        paymentMethod = method;
+        
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+          btn.classList.toggle('selected', btn.dataset.method === method);
+        });
+        
+        if (receivedSection) {
+          receivedSection.classList.add('show');
+        }
+        
+        if (method === 'Cartão/PIX') {
+          if (receivedInput) {
+            receivedInput.value = total.toFixed(2).replace('.', ',');
+            receivedInput.readOnly = true;
+          }
+          if (changeAmount) {
+            changeAmount.style.display = 'none';
+          }
+        } else {
+          if (receivedInput) {
+            receivedInput.value = '';
+            receivedInput.readOnly = false;
+          }
+          if (changeAmount) {
+            changeAmount.style.display = 'block';
+          }
+        }
+        
+        showNotification(`Pagamento: ${method}`, 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Select Payment Method');
+        showNotification('Erro ao selecionar pagamento', 'error');
+      }
+    }
+
+    // Update Change
+    function updateChange() {
+      try {
+        if (!receivedInput || !changeAmount) return;
+        
+        const received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+        const change = received - total;
+        
+        if (change >= 0) {
+          changeAmount.textContent = `Troco: R$ ${change.toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--success-color)';
+        } else {
+          changeAmount.textContent = `Falta: R$ ${Math.abs(change).toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--error-color)';
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Change');
+      }
+    }
+
+    // Save Cart
+    function saveCart() {
+      try {
+        localStorage.setItem('currentCart', JSON.stringify(cart));
+      } catch (error) {
+        errorHandler.handleError(error, 'Save Cart');
+      }
+    }
+
+    // Load Saved Cart
+    function loadSavedCart() {
+      try {
+        const savedCart = localStorage.getItem('currentCart');
+        if (savedCart) {
+          cart = JSON.parse(savedCart);
+          renderCart();
+          updateTotal();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Load Saved Cart');
+      }
+    }
+
+    // Clear All
+    function clearAll() {
+      if (confirm('Deseja limpar todo o carrinho?')) {
+        try {
+          cart = [];
+          total = 0;
+          paymentMethod = '';
+          
+          renderCart();
+          updateTotal();
+          saveCart();
+          
+          document.querySelectorAll('.payment-btn').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          
+          if (receivedSection) receivedSection.classList.remove('show');
+          if (receivedInput) receivedInput.value = '';
+          if (changeAmount) changeAmount.textContent = '';
+          
+          showNotification('Carrinho limpo', 'success');
+        } catch (error) {
+          errorHandler.handleError(error, 'Clear All');
+          showNotification('Erro ao limpar carrinho', 'error');
+        }
+      }
+    }
+
+    // Process Next Customer
+    function processNext() {
+      try {
+        if (cart.length === 0) {
+          showNotification('Adicione itens ao carrinho', 'warning');
+          return;
+        }
+        
+        if (!paymentMethod) {
+          showNotification('Selecione a forma de pagamento', 'warning');
+          return;
+        }
+        
+        if (paymentMethod === 'Dinheiro' && (!receivedInput || !receivedInput.value)) {
+          showNotification('Digite o valor recebido', 'warning');
+          return;
+        }
+        
+        let received = total;
+        if (paymentMethod === 'Dinheiro') {
+          received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+          
+          if (received < total) {
+            showNotification('Valor recebido é menor que o total', 'warning');
+            return;
+          }
+        }
+        
+        saveSale(received);
+        
+        cart = [];
+        total = 0;
+        paymentMethod = '';
+        renderCart();
+        updateTotal();
+        saveCart();
+        
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+        
+        if (receivedSection) receivedSection.classList.remove('show');
+        if (receivedInput) receivedInput.value = '';
+        if (changeAmount) changeAmount.textContent = '';
+        
+        hapticFeedback('success');
+        showNotification('Venda processada!', 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Process Next');
+        showNotification('Erro ao processar venda', 'error');
+      }
+    }
+
+    // Save Sale
+    function saveSale(received) {
+      try {
+        const now = new Date();
+        const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+        
+        const sale = {
+          id: Date.now(),
+          items: [...cart],
+          total: total,
+          paymentMethod: paymentMethod,
+          received: received,
+          change: received - total,
+          timestamp: now.toISOString(),
+          date: now.toLocaleDateString('pt-BR'),
+          time: now.toLocaleTimeString('pt-BR'),
+          turn: activeTurn
+        };
+        
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        salesHistory.unshift(sale);
+        localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
+      } catch (error) {
+        errorHandler.handleError(error, 'Save Sale');
+      }
+    }
+
+    /* Responsive para diferentes tamanhos de tela */
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 1.1rem;
+      }
+      
+      .header {
+        height: 55px;
+      }
+
+      .total-amount {
+        font-size: 1rem;
+      }
+
+      .turn-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 250px;
+      }
+
+      .keyboard-grid {
+        gap: 12px;
+      }
+
+      .keyboard-btn {
+        min-height: 60px;
+        font-size: 1.8rem;
+      }
+
+      .financial-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-list {
+        max-height: 120px;
+      }
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+      .header {
+        height: 65px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .main-container {
+        max-width: 420px;
+        margin: 0 auto;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+      }
+    }
+
+    /* Melhorias para toque rápido */
+    .product-btn,
+    .keyboard-btn,
+    .payment-btn,
+    .next-btn,
+    .secondary-btn,
+    .bottom-btn {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Animações otimizadas */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .animate-slide-up {
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .animate-slide-left {
+      animation: slideInLeft 0.3s ease-out;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Correções específicas para iOS */
+    @supports (-webkit-touch-callout: none) {
+      .virtual-keyboard {
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+      }
+      
+      .keyboard-btn,
+      .product-btn {
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+      }
+    }
+
+    /* Instalação PWA */
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+
+    .install-prompt.show {
+      display: flex;
+    }
+
+    .install-prompt-content {
+      flex: 1;
+    }
+
+    .install-prompt-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .install-prompt-text {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .install-btn {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .install-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">F</div>
+    <div class="loading-text">Carregando Caixa Freitas...</div>
+  </div>
+
+  <!-- Turn Selection -->
+  <div class="turn-selection" id="turnSelection" style="display: none;">
+    <div class="turn-logo">F</div>
+    <h2 class="turn-title">Bem-vindo ao Caixa Freitas</h2>
+    <p class="turn-subtitle">Selecione o turno para começar</p>
+    <div class="turn-buttons">
+      <button class="turn-btn" onclick="startTurn('manhã')">
+        <span class="turn-emoji">☀️</span>
+        Turno da Manhã
+      </button>
+      <button class="turn-btn" onclick="startTurn('tarde')">
+        <span class="turn-emoji">🌅</span>
+        Turno da Tarde
+      </button>
+    </div>
+  </div>
+
+  <!-- Install Prompt -->
+  <div class="install-prompt" id="installPrompt">
+    <div class="install-prompt-content">
+      <div class="install-prompt-title">Instalar App</div>
+      <div class="install-prompt-text">Adicione o Caixa Freitas à sua tela inicial</div>
+    </div>
+    <button class="install-btn" id="installBtn">Instalar</button>
+    <button class="install-close" onclick="hideInstallPrompt()">×</button>
+  </div>
+
+  <!-- Password Modal -->
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Acesso Profissional</h3>
+        <button class="modal-close" onclick="closePasswordModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px; color: var(--text-secondary);">Digite a senha para acessar o histórico profissional:</p>
+        <input type="password" class="password-input" id="passwordInput" placeholder="••••" maxlength="4">
+        <button class="next-btn" onclick="checkPassword()" style="width: 100%; margin: 0;">
+          <i class="fas fa-unlock"></i>
+          Entrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sangria Modal -->
+  <div class="modal-overlay" id="sangriaModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Sangria do Caixa</h3>
+        <button class="modal-close" onclick="closeSangriaModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px; color: var(--text-secondary);">Digite o valor da retirada:</p>
+        <input type="text" class="received-input" id="sangriaInput" placeholder="R$ 0,00" readonly style="background: #FFEBEE;">
+        <textarea class="supplier-description" id="sangriaObservation" placeholder="Observação (opcional)"></textarea>
+        <button class="next-btn" onclick="processSangria()" style="width: 100%; margin: 0;">
+          <i class="fas fa-money-bill-wave"></i>
+          Registrar Sangria
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplier Payment Modal -->
+  <div class="modal-overlay" id="supplierModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Pagamento a Fornecedor</h3>
+        <button class="modal-close" onclick="closeSupplierModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px; color: var(--text-secondary);">Digite o valor pago ao fornecedor:</p>
+        <input type="text" class="received-input" id="supplierInput" placeholder="R$ 0,00" readonly style="background: #E8F5E8;">
+        <textarea class="supplier-description" id="supplierDescription" placeholder="Descrição do pagamento (ex: Fornecedor João - Compra de farinha)"></textarea>
+        <button class="next-btn" onclick="processSupplierPayment()" style="width: 100%; margin: 0;">
+          <i class="fas fa-hand-holding-usd"></i>
+          Registrar Pagamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <i class="notification-icon fas fa-exclamation-triangle"></i>
+    <span class="notification-message" id="notificationMessage">Mensagem</span>
+    <button class="notification-close" onclick="hideNotification()">×</button>
+  </div>
+
+  <!-- Virtual Keyboard -->
+  <div class="virtual-keyboard" id="virtualKeyboard">
+    <div class="keyboard-header">
+      <span class="keyboard-title" id="keyboardTitle">Digite o valor</span>
+      <button class="keyboard-close" onclick="closeKeyboard()">×</button>
+    </div>
+    <div class="keyboard-display" id="keyboardDisplay">0</div>
+    <div class="keyboard-grid">
+      <button class="keyboard-btn" data-digit="1">1</button>
+      <button class="keyboard-btn" data-digit="2">2</button>
+      <button class="keyboard-btn" data-digit="3">3</button>
+      <button class="keyboard-btn" data-digit="4">4</button>
+      <button class="keyboard-btn" data-digit="5">5</button>
+      <button class="keyboard-btn" data-digit="6">6</button>
+      <button class="keyboard-btn" data-digit="7">7</button>
+      <button class="keyboard-btn" data-digit="8">8</button>
+      <button class="keyboard-btn" data-digit="9">9</button>
+      <button class="keyboard-btn" id="commaBtn">,</button>
+      <button class="keyboard-btn" data-digit="0">0</button>
+      <button class="keyboard-btn" id="backspaceBtn">
+        <i class="fas fa-backspace"></i>
+      </button>
+    </div>
+    <div class="keyboard-actions">
+      <button class="keyboard-cancel" onclick="cancelKeyboard()">Cancelar</button>
+      <button class="keyboard-confirm" onclick="confirmKeyboard()">Confirmar</button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" style="display: none;" class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <h1>F Caixa Freitas</h1>
+      <div class="turno-info" id="turnInfo">
+        <i class="fas fa-clock"></i>
+        <span id="turnText">Carregando...</span>
+      </div>
+    </header>
+
+    <!-- Content Container -->
+    <div class="content-container">
+      <!-- Products Section -->
+      <section class="products-section animate-slide-up">
+        <h3 class="section-title">
+          <i class="fas fa-bread-slice"></i>
+          Produtos
+        </h3>
+        <div class="products-grid">
+          <button class="product-btn" data-label="Pão de Sal" data-price="0.70">
+            <span>Pão de Sal</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" data-label="Pão Doce Comum" data-price="0.70">
+            <span>Pão Doce Comum</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" data-label="Pão Doce Especial" data-price="0.80">
+            <span>Pão Doce Especial</span>
+            <span class="price">R$ 0,80</span>
+          </button>
+          <button class="product-btn others-btn" id="othersBtn">
+            <span>Outros</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section class="summary-section animate-slide-up">
+        <h3 class="section-title">
+          <i class="fas fa-shopping-cart"></i>
+          Resumo do Pedido
+        </h3>
+        
+        <div class="summary-list" id="summaryList">
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Nenhum item adicionado</p>
+          </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+          <div class="total-amount">
+            Total: <span id="totalAmount">R$ 0,00</span>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="payment-section">
+            <h4 class="section-title">
+              <i class="fas fa-credit-card"></i>
+              Forma de Pagamento
+            </h4>
+            <div class="payment-methods">
+              <button class="payment-btn" data-method="Dinheiro">
+                <i class="fas fa-money-bill-wave"></i>
+                Dinheiro
+              </button>
+              <button class="payment-btn" data-method="Cartão/PIX">
+                <i class="fas fa-credit-card"></i>
+                Cartão/PIX
+              </button>
+            </div>
+          </div>
+
+          <!-- Received Amount -->
+          <div class="received-section" id="receivedSection">
+            <input type="text" class="received-input" id="receivedInput" placeholder="Valor recebido" readonly>
+            <div class="change-amount" id="changeAmount" style="display: none;"></div>
+          </div>
+
+          <!-- Main Action Button -->
+          <div class="main-action-button">
+            <button class="next-btn" id="nextBtn" onclick="processNext()">
+              <i class="fas fa-check"></i>
+              Próximo Cliente
+            </button>
+          </div>
+
+          <!-- Secondary Buttons -->
+          <div class="secondary-buttons">
+            <button class="secondary-btn clear-btn" onclick="clearAll()">
+              <i class="fas fa-trash"></i>
+              Limpar
+            </button>
+            <button class="secondary-btn payment-supplier-btn" onclick="openSupplierPayment()">
+              <i class="fas fa-hand-holding-usd"></i>
+              Pagamento
+            </button>
+          </div>
+
+          <!-- Bottom Buttons -->
+          <div class="bottom-buttons">
+            <button class="bottom-btn" onclick="openHistory()">
+              <i class="fas fa-history"></i>
+              Histórico
+            </button>
+            <button class="bottom-btn pro" onclick="openProHistory()">
+              <i class="fas fa-chart-line"></i>
+              Pro
+            </button>
+          </div>
+
+          <!-- Additional Bottom Buttons -->
+          <div class="bottom-buttons" style="margin-top: 5px;">
+            <button class="bottom-btn" onclick="openSangria()">
+              <i class="fas fa-money-bill-wave"></i>
+              Sangria
+            </button>
+            <button class="bottom-btn" onclick="closeTurn()" style="background: linear-gradient(135deg, var(--error-color), #d32f2f);">
+              <i class="fas fa-times"></i>
+              Fechar
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <script>
+    // SISTEMA DE TRATAMENTO DE ERROS OTIMIZADO
+    class ErrorHandler {
+      static instance = null;
+      
+      constructor() {
+        if (ErrorHandler.instance) {
+          return ErrorHandler.instance;
+        }
+        ErrorHandler.instance = this;
+        this.setupGlobalErrorHandlers();
+      }
+      
+      setupGlobalErrorHandlers() {
+        window.addEventListener('error', (event) => {
+          this.handleError(event.error, 'JavaScript Error', event.filename, event.lineno);
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+          this.handleError(event.reason, 'Promise Rejection');
+          event.preventDefault();
+        });
+      }
+      
+      handleError(error, type = 'Error', filename = '', lineno = 0) {
+        console.error(`[${type}]`, error, filename, lineno);
+        
+        if (this.isCriticalError(error)) {
+          this.showErrorNotification('Erro crítico detectado. Recarregue a página.');
+        }
+      }
+      
+      isCriticalError(error) {
+        const criticalPatterns = [
+          /Cannot read property/,
+          /Cannot read properties/,
+          /is not a function/,
+          /Unexpected token/
+        ];
+        
+        const message = error?.message || error?.toString() || '';
+        return criticalPatterns.some(pattern => pattern.test(message));
+      }
+      
+      showErrorNotification(message) {
+        if (typeof showNotification === 'function') {
+          showNotification(message, 'error');
+        }
+      }
+      
+      static getInstance() {
+        if (!ErrorHandler.instance) {
+          new ErrorHandler();
+        }
+        return ErrorHandler.instance;
+      }
+    }
+
+    // Inicializar tratamento de erros
+    const errorHandler = ErrorHandler.getInstance();
+
+    // App State
+    let cart = [];
+    let total = 0;
+    let paymentMethod = '';
+    let keyboardValue = '';
+    let keyboardTarget = null;
+    let editingIndex = null;
+    let currentTurnFilter = 'all';
+    let currentDateFilter = 'today';
+    let customStartDate = '';
+    let customEndDate = '';
+    let deferredPrompt = null;
+
+    // DOM Elements
+    let loadingScreen, turnSelection, mainApp, summaryList, totalAmount;
+    let receivedSection, receivedInput, changeAmount, virtualKeyboard;
+    let keyboardDisplay, keyboardTitle, notification, notificationMessage;
+    let turnInfo, turnText, passwordModal, passwordInput;
+    let sangriaModal, sangriaInput, sangriaObservation;
+    let supplierModal, supplierInput, supplierDescription;
+    let installPrompt, installBtn;
+
+    // Inicializar elementos DOM
+    function initializeDOMElements() {
+      try {
+        loadingScreen = document.getElementById('loadingScreen');
+        turnSelection = document.getElementById('turnSelection');
+        mainApp = document.getElementById('mainApp');
+        summaryList = document.getElementById('summaryList');
+        totalAmount = document.getElementById('totalAmount');
+        receivedSection = document.getElementById('receivedSection');
+        receivedInput = document.getElementById('receivedInput');
+        changeAmount = document.getElementById('changeAmount');
+        virtualKeyboard = document.getElementById('virtualKeyboard');
+        keyboardDisplay = document.getElementById('keyboardDisplay');
+        keyboardTitle = document.getElementById('keyboardTitle');
+        notification = document.getElementById('notification');
+        notificationMessage = document.getElementById('notificationMessage');
+        turnInfo = document.getElementById('turnInfo');
+        turnText = document.getElementById('turnText');
+        passwordModal = document.getElementById('passwordModal');
+        passwordInput = document.getElementById('passwordInput');
+        sangriaModal = document.getElementById('sangriaModal');
+        sangriaInput = document.getElementById('sangriaInput');
+        sangriaObservation = document.getElementById('sangriaObservation');
+        supplierModal = document.getElementById('supplierModal');
+        supplierInput = document.getElementById('supplierInput');
+        supplierDescription = document.getElementById('supplierDescription');
+        installPrompt = document.getElementById('installPrompt');
+        installBtn = document.getElementById('installBtn');
+        
+        return true;
+      } catch (error) {
+        errorHandler.handleError(error, 'DOM Initialization');
+        return false;
+      }
+    }
+
+    // Check Turn Status
+    function checkTurnStatus() {
+      try {
+        const activeTurn = localStorage.getItem('activeTurn');
+        if (!activeTurn) {
+          if (turnSelection) turnSelection.style.display = 'flex';
+        } else {
+          const turn = JSON.parse(activeTurn);
+          updateTurnInfo(turn);
+          if (mainApp) mainApp.style.display = 'block';
+          renderCart();
+          loadSavedCart();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Turn Status Check');
+        if (turnSelection) turnSelection.style.display = 'flex';
+      }
+    }
+
+    // Start Turn
+    function startTurn(type) {
+      try {
+        if (!type || (type !== 'manhã' && type !== 'tarde')) {
+          throw new Error('Tipo de turno inválido');
+        }
+        
+        const now = new Date();
+        const turn = {
+          type: type,
+          startTime: now.toLocaleTimeString('pt-BR'),
+          startDate: now.toLocaleDateString('pt-BR'),
+          timestamp: now.toISOString(),
+          initialCash: 0
+        };
+        
+        localStorage.setItem('activeTurn', JSON.stringify(turn));
+        
+        if (turnSelection) {
+          turnSelection.style.opacity = '0';
+          setTimeout(() => {
+            turnSelection.style.display = 'none';
+            updateTurnInfo(turn);
+            if (mainApp) {
+              mainApp.style.display = 'block';
+              mainApp.style.opacity = '1';
+            }
+          }, 300);
+        }
+        
+        hapticFeedback('success');
+        showNotification(`Turno da ${type} iniciado!`, 'success');
+      } catch (error) {
+        errorHandler.handleError(error, 'Start Turn');
+        showNotification('Erro ao iniciar turno', 'error');
+      }
+    }
+
+    // Close Turn
+    function closeTurn() {
+      if (confirm('Deseja realmente fechar o turno atual?')) {
+        try {
+          const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+          const now = new Date();
+          
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+          const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+          
+          const turnSales = salesHistory.filter(sale => 
+            sale.turn && sale.turn.timestamp === activeTurn.timestamp
+          );
+          
+          const turnSangrias = sangriaHistory.filter(sangria => 
+            sangria.turn && sangria.turn.timestamp === activeTurn.timestamp
+          );
+          
+          const turnSuppliers = supplierHistory.filter(supplier => 
+            supplier.turn && supplier.turn.timestamp === activeTurn.timestamp
+          );
+          
+          const totalSales = turnSales.reduce((sum, sale) => sum + sale.total, 0);
+          const totalSangrias = turnSangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+          const totalSuppliers = turnSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+          const cashSales = turnSales.filter(sale => sale.paymentMethod === 'Dinheiro').reduce((sum, sale) => sum + sale.total, 0);
+          const cardSales = turnSales.filter(sale => sale.paymentMethod === 'Cartão/PIX').reduce((sum, sale) => sum + sale.total, 0);
+          
+          const closedTurn = {
+            ...activeTurn,
+            endTime: now.toLocaleTimeString('pt-BR'),
+            endDate: now.toLocaleDateString('pt-BR'),
+            endTimestamp: now.toISOString(),
+            closed: true,
+            summary: {
+              totalSales: totalSales,
+              totalSangrias: totalSangrias,
+              totalSuppliers: totalSuppliers,
+              salesCount: turnSales.length,
+              sangriaCount: turnSangrias.length,
+              supplierCount: turnSuppliers.length,
+              finalCash: totalSales - totalSangrias - totalSuppliers,
+              cashSales: cashSales,
+              cardSales: cardSales
+            }
+          };
+          
+          const turnHistory = JSON.parse(localStorage.getItem('turnHistory') || '[]');
+          turnHistory.unshift(closedTurn);
+          localStorage.setItem('turnHistory', JSON.stringify(turnHistory));
+          
+          localStorage.removeItem('activeTurn');
+          localStorage.removeItem('currentCart');
+          
+          cart = [];
+          total = 0;
+          paymentMethod = '';
+          renderCart();
+          updateTotal();
+          
+          document.querySelectorAll('.payment-btn').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          
+          if (receivedSection) receivedSection.classList.remove('show');
+          if (receivedInput) receivedInput.value = '';
+          if (changeAmount) changeAmount.textContent = '';
+          
+          // Gerar relatório para WhatsApp
+          const report = generateWhatsAppReport(closedTurn, turnSales, turnSangrias, turnSuppliers);
+          sendToWhatsApp(report);
+          
+          if (mainApp) mainApp.style.display = 'none';
+          if (turnSelection) turnSelection.style.display = 'flex';
+          
+          hapticFeedback('success');
+          showNotification('Turno fechado com sucesso!', 'success');
+        } catch (error) {
+          errorHandler.handleError(error, 'Close Turn');
+          showNotification('Erro ao fechar turno', 'error');
+        }
+      }
+    }
+
+    // Gerar relatório para WhatsApp
+    function generateWhatsAppReport(turn, sales, sangrias, suppliers) {
+      try {
+        const cashSales = sales.filter(sale => sale.paymentMethod === 'Dinheiro');
+        const cardSales = sales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+        const totalCash = cashSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalCard = cardSales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalSangrias = sangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+        const totalSuppliers = suppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+        
+        return `🥖 *RELATÓRIO CAIXA FREITAS*
+${turn.type === 'manhã' ? '☀️' : '🌅'} *Turno da ${turn.type.charAt(0).toUpperCase() + turn.type.slice(1)}*
+📅 ${turn.startDate}
+⏰ ${turn.startTime} - ${turn.endTime}
+
+💰 *RESUMO FINANCEIRO*
+💵 Vendas Dinheiro: R$ ${totalCash.toFixed(2).replace('.', ',')} (${cashSales.length} vendas)
+💳 Vendas Cartão/PIX: R$ ${totalCard.toFixed(2).replace('.', ',')} (${cardSales.length} vendas)
+📊 Total Vendas: R$ ${(totalCash + totalCard).toFixed(2).replace('.', ',')} (${sales.length} vendas)
+🔴 Sangrias: R$ ${totalSangrias.toFixed(2).replace('.', ',')} (${sangrias.length} retiradas)
+🏪 Pagto Fornecedores: R$ ${totalSuppliers.toFixed(2).replace('.', ',')} (${suppliers.length} pagamentos)
+💰 Saldo Final: R$ ${(totalCash + totalCard - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}
+💸 Caixa Final (Dinheiro): R$ ${(totalCash - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}
+
+_Relatório gerado automaticamente pelo Sistema Caixa Freitas v8.1 PWA_`;
+      } catch (error) {
+        errorHandler.handleError(error, 'WhatsApp Report Generation');
+        return 'Erro ao gerar relatório';
+      }
+    }
+
+    // Enviar para WhatsApp
+    function sendToWhatsApp(message) {
+      try {
+        const phoneNumber = '5527992259237';
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+        
+        window.open(whatsappUrl, '_blank');
+      } catch (error) {
+        errorHandler.handleError(error, 'WhatsApp Send');
+        showNotification('Erro ao enviar relatório', 'error');
+      }
+    }
+
+    // Update Turn Info
+    function updateTurnInfo(turn) {
+      try {
+        if (!turn || !turn.type) {
+          throw new Error('Dados do turno inválidos');
+        }
+        
+        const emoji = turn.type === 'manhã' ? '☀️' : '🌅';
+        if (turnText) {
+          turnText.textContent = `${emoji} Turno da ${turn.type.charAt(0).toUpperCase() + turn.type.slice(1)} - ${turn.startTime}`;
+        } else {
+          throw new Error('Elemento turnText não encontrado');
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'Update Turn Info');
+        if (turnText) turnText.textContent = 'Turno Ativo';
+      }
+    }
