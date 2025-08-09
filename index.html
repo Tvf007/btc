@@ -1,0 +1,3527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Caixa Freitas">
+  <meta name="theme-color" content="#4a1a2e">
+  <title>Super Caixa Freitas v8.3 Pro</title>
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkY8L3RleHQ+Cjwvc3ZnPgo=">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #4a1a2e;
+      --primary-dark: #2d0f1c;
+      --secondary: #43A047;
+      --error: #E53935;
+      --warning: #FF9800;
+      --success: #28a745;
+      --surface: #FFFFFF;
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --text-light: #6c757d;
+      --border: #dee2e6;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --spacing: 16px;
+      --z-loading: 10000;
+      --z-modal: 15000;
+      --z-notification: 20000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);
+      color: var(--text);
+      overflow: hidden;
+      min-height: 100vh;
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    @media (display-mode: standalone) {
+      body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      
+      .header {
+        padding-top: max(12px, env(safe-area-inset-top, 12px));
+      }
+      
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      
+      html {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      body {
+        -webkit-overflow-scrolling: touch;
+        -webkit-appearance: none;
+      }
+      
+      .header {
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+      }
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: var(--z-loading);
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-logo {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 12px var(--spacing);
+      position: relative;
+      box-shadow: 0 2px 10px rgba(74, 26, 46, 0.2);
+      border-radius: 0 0 16px 16px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .turno-info {
+      font-size: 0.8rem;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.15);
+      padding: 4px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      margin-top: 8px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 8px;
+      height: calc(100vh - 100px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .product-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      box-shadow: 0 2px 8px rgba(74, 26, 46, 0.2);
+      position: relative;
+      overflow: hidden;
+      min-height: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      touch-action: manipulation;
+    }
+
+    .product-btn:active {
+      transform: scale(0.95);
+    }
+
+    .product-btn .price {
+      font-size: 0.7rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    .others-btn {
+      background: linear-gradient(135deg, var(--warning), #F57C00);
+      position: relative;
+    }
+
+    .others-btn::after {
+      content: '+';
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    /* Summary Section */
+    .summary-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .summary-list {
+      height: 120px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+    }
+
+    .summary-list::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .summary-list::-webkit-scrollbar-track {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .summary-list::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      margin-bottom: 4px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .summary-item:active {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .item-label {
+      font-weight: 600;
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+
+    .item-quantity {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.85rem;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--error);
+      padding: 6px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      font-size: 0.8rem;
+      z-index: 10;
+    }
+
+    .delete-btn:active {
+      background: #ffebee;
+      transform: scale(1.1);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 20px 10px;
+      color: var(--text-light);
+    }
+
+    .empty-cart i {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    /* Total Section */
+    .total-section {
+      flex-shrink: 0;
+    }
+
+    .total-amount {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 8px;
+      background: linear-gradient(135deg, #fff, #f8f9fa);
+    }
+
+    /* Payment Methods */
+    .payment-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .payment-btn {
+      background: linear-gradient(135deg, #ffffff, #f1f3f4);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.85rem;
+      position: relative;
+    }
+
+    .payment-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .payment-btn.selected {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+      border-color: var(--success);
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .payment-btn.selected::after {
+      content: '✓';
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: white;
+      color: var(--success);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: 2px solid var(--success);
+    }
+
+    .payment-btn:active:not(.selected) {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    /* Received Section */
+    .received-section {
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .received-section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .received-input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+    }
+
+    .received-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(74, 26, 46, 0.1);
+    }
+
+    .change-amount {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--success);
+      margin-top: 6px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .action-buttons-row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .action-btn {
+      padding: 10px 8px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+    }
+
+    .next-btn {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 800;
+      grid-row: 1;
+      grid-column: 1;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+      position: relative;
+    }
+
+    .next-btn::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--success), #218838);
+      border-radius: var(--radius);
+      z-index: -1;
+      opacity: 0.3;
+      animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.05); opacity: 0.1; }
+    }
+
+    .clear-btn {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+    }
+
+    .payment-supplier-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-size: 0.7rem;
+    }
+
+    .sangria-btn {
+      background: linear-gradient(135deg, var(--warning), #F57C00);
+      color: white;
+      font-size: 0.7rem;
+    }
+
+    .close-turn-btn {
+      background: linear-gradient(135deg, var(--text-light), #424242);
+      color: white;
+      font-size: 0.7rem;
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* History Buttons */
+    .history-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .history-btn {
+      background: linear-gradient(135deg, var(--text-light), #424242);
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.75rem;
+    }
+
+    .history-btn.pro {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .history-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Virtual Keyboard */
+    .virtual-keyboard {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(74, 26, 46, 0.98), rgba(45, 15, 28, 0.98));
+      backdrop-filter: blur(15px);
+      padding: 20px;
+      z-index: 16000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .virtual-keyboard.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .keyboard-container {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: slideInKeyboard 0.3s ease-out;
+      z-index: 16001;
+    }
+
+    @keyframes slideInKeyboard {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .keyboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .keyboard-title {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .keyboard-close {
+      background: var(--error);
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      font-weight: bold;
+    }
+
+    .keyboard-close:active {
+      background: #d32f2f;
+      transform: scale(0.9);
+    }
+
+    .keyboard-display {
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      padding: 16px;
+      border-radius: var(--radius);
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 16px;
+      border: 3px solid #f9a825;
+      letter-spacing: 2px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .keyboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .keyboard-btn {
+      aspect-ratio: 1;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      box-shadow: 0 4px 12px rgba(74, 26, 46, 0.3);
+      min-height: 60px;
+    }
+
+    .keyboard-btn:active {
+      background: linear-gradient(135deg, var(--primary-dark), #1a0b14);
+      transform: scale(0.95);
+    }
+
+    .keyboard-actions {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 12px;
+    }
+
+    .keyboard-cancel,
+    .keyboard-confirm {
+      border: none;
+      border-radius: var(--radius);
+      padding: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      font-size: 1rem;
+    }
+
+    .keyboard-cancel {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+    }
+
+    .keyboard-confirm {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+    }
+
+    .keyboard-cancel:active,
+    .keyboard-confirm:active {
+      transform: scale(0.95);
+    }
+
+    /* Turn Selection */
+    .turn-selection {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: var(--z-loading);
+      color: white;
+      padding: 20px;
+    }
+
+    .turn-logo {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .turn-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .turn-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .turn-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .turn-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 160px;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    .turn-btn:active {
+      background: rgba(255,255,255,0.3);
+      transform: scale(0.95);
+    }
+
+    .turn-emoji {
+      font-size: 1.5rem;
+    }
+
+    /* Modal System */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 15500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: scale(0.8);
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      z-index: 15501;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:active {
+      background: var(--border);
+      transform: scale(0.9);
+    }
+
+    /* Form Elements */
+    .form-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(74, 26, 46, 0.1);
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 14px;
+      font-size: 0.9rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      resize: none;
+      height: 80px;
+      font-family: inherit;
+      margin-bottom: 16px;
+    }
+
+    /* Filter Controls */
+    .filter-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn {
+      background: linear-gradient(135deg, #ffffff, #f1f3f4);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .filter-btn.selected {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .filter-btn:active {
+      transform: scale(0.95);
+    }
+
+    .date-filter-section {
+      margin-bottom: 16px;
+    }
+
+    .date-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .date-input {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.9rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-weight: 600;
+    }
+
+    /* Notification System */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: var(--z-notification);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 90vw;
+      opacity: 0;
+      transform: translateX(-50%) translateY(-30px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+      background: #fdf2f2;
+    }
+
+    .notification.warning {
+      border-left: 4px solid var(--warning);
+      background: #fffbf0;
+    }
+
+    .notification-icon {
+      font-size: 1.3rem;
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error);
+    }
+
+    .notification.warning .notification-icon {
+      color: var(--warning);
+    }
+
+    .notification-message {
+      flex: 1;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .notification-close:active {
+      background: var(--border);
+      transform: scale(0.9);
+    }
+
+    /* Financial Summary Cards */
+    .financial-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card.clickable {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .summary-card.clickable:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .summary-card.clickable:active {
+      transform: scale(0.98);
+    }
+
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .cash-value { color: var(--success); }
+    .card-value { color: #2196F3; }
+    .sangria-value { color: var(--error); }
+    .supplier-value { color: var(--primary); }
+
+    /* Detail List */
+    .detail-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8f9fa;
+    }
+
+    .detail-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      background: white;
+      margin-bottom: 1px;
+    }
+
+    .detail-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .detail-amount {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .detail-time {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .detail-description {
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-top: 4px;
+    }
+
+    /* Animations */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .animate-slide-up {
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .animate-slide-left {
+      animation: slideInLeft 0.3s ease-out;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .container {
+        padding: 6px;
+        height: calc(100vh - 90px);
+        gap: 6px;
+      }
+
+      .card {
+        padding: 8px;
+      }
+
+      .header h1 {
+        font-size: 1.3rem;
+      }
+
+      .total-amount {
+        font-size: 1.2rem;
+        padding: 6px;
+      }
+
+      .turn-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 250px;
+      }
+
+      .action-buttons {
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 6px;
+      }
+
+      .action-buttons-row2 {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 6px;
+      }
+
+      .keyboard-container {
+        padding: 15px;
+      }
+
+      .keyboard-grid {
+        gap: 8px;
+      }
+
+      .keyboard-btn {
+        min-height: 50px;
+        font-size: 1.2rem;
+      }
+
+      .financial-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .products-grid {
+        gap: 6px;
+      }
+
+      .product-btn {
+        min-height: 45px;
+        padding: 10px 6px;
+        font-size: 0.75rem;
+      }
+
+      .summary-list {
+        height: 100px;
+      }
+
+      .filter-controls,
+      .date-inputs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      .header {
+        padding: 8px var(--spacing);
+      }
+      
+      .container {
+        height: calc(100vh - 80px);
+      }
+      
+      .summary-list {
+        height: 80px;
+      }
+      
+      .keyboard-container {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+    }
+
+    @media (display-mode: standalone) {
+      body {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .header {
+        padding-top: max(12px, env(safe-area-inset-top));
+      }
+      
+      html {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      .keyboard-btn,
+      .product-btn,
+      .action-btn {
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+      }
+    }
+
+    .product-btn,
+    .keyboard-btn,
+    .payment-btn,
+    .action-btn {
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    @media (prefers-contrast: high) {
+      :root {
+        --shadow: 0 2px 8px rgba(0,0,0,0.3);
+        --border: #000000;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">F</div>
+    <div class="loading-text">Carregando Caixa Freitas v8.3...</div>
+  </div>
+
+  <!-- Turn Selection -->
+  <div class="turn-selection" id="turnSelection" style="display: none;">
+    <div class="turn-logo">F</div>
+    <h2 class="turn-title">Bem-vindo ao Caixa Freitas</h2>
+    <p class="turn-subtitle">Selecione o turno para começar</p>
+    <div class="turn-buttons">
+      <button class="turn-btn" data-turn="manhã">
+        <span class="turn-emoji">☀️</span>
+        Turno da Manhã
+      </button>
+      <button class="turn-btn" data-turn="tarde">
+        <span class="turn-emoji">🌅</span>
+        Turno da Tarde
+      </button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" style="display: none;">
+    <!-- Header -->
+    <header class="header">
+      <h1>Caixa Freitas</h1>
+      <div class="turno-info" id="turnInfo">
+        <i class="fas fa-clock"></i>
+        <span id="turnText">Carregando...</span>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Products Section -->
+      <section class="card animate-slide-up">
+        <h3 class="section-title">
+          <i class="fas fa-bread-slice"></i>
+          Produtos
+        </h3>
+        <div class="products-grid" id="productsGrid">
+          <button class="product-btn" data-label="Pão de Sal" data-price="0.70">
+            <span>Pão de Sal</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" data-label="Pão Doce Comum" data-price="0.70">
+            <span>Pão Doce Comum</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" data-label="Pão Doce Especial" data-price="0.80">
+            <span>Pão Doce Especial</span>
+            <span class="price">R$ 0,80</span>
+          </button>
+          <button class="product-btn others-btn" id="othersBtn">
+            <span>Outros</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section class="card summary-section animate-slide-up">
+        <h3 class="section-title">
+          <i class="fas fa-shopping-cart"></i>
+          Pedido
+        </h3>
+        
+        <div class="summary-list" id="summaryList">
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Nenhum item adicionado</p>
+          </div>
+        </div>
+
+        <div class="total-section">
+          <div class="total-amount">
+            Total: <span id="totalAmount">R$ 0,00</span>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="payment-section">
+            <h4 class="section-title">
+              <i class="fas fa-credit-card"></i>
+              Pagamento
+            </h4>
+            <div class="payment-methods">
+              <button class="payment-btn" data-method="Dinheiro">
+                <i class="fas fa-money-bill-wave"></i>
+                Dinheiro
+              </button>
+              <button class="payment-btn" data-method="Cartão/PIX">
+                <i class="fas fa-credit-card"></i>
+                Cartão/PIX
+              </button>
+            </div>
+          </div>
+
+          <!-- Received Amount -->
+          <div class="received-section" id="receivedSection">
+            <input type="text" class="received-input" id="receivedInput" placeholder="Valor recebido" readonly>
+            <div class="change-amount" id="changeAmount" style="display: none;"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn next-btn" id="nextBtn">
+              <i class="fas fa-check"></i>
+              Próximo Cliente
+            </button>
+            <button class="action-btn clear-btn" id="clearBtn">
+              <i class="fas fa-trash"></i>
+              Limpar
+            </button>
+            <button class="action-btn payment-supplier-btn" id="supplierBtn">
+              <i class="fas fa-hand-holding-usd"></i>
+              Pagamento
+            </button>
+          </div>
+
+          <div class="action-buttons-row2">
+            <button class="action-btn sangria-btn" id="sangriaBtn">
+              <i class="fas fa-money-bill-wave"></i>
+              Sangria
+            </button>
+            <button class="action-btn close-turn-btn" id="closeTurnBtn">
+              <i class="fas fa-times"></i>
+              Fechar
+            </button>
+            <button class="history-btn" id="historyBtn">
+              <i class="fas fa-history"></i>
+              Histórico
+            </button>
+            <button class="history-btn pro" id="proHistoryBtn">
+              <i class="fas fa-chart-line"></i>
+              Pro
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Virtual Keyboard -->
+  <div class="virtual-keyboard" id="virtualKeyboard">
+    <div class="keyboard-container">
+      <div class="keyboard-header">
+        <span class="keyboard-title" id="keyboardTitle">Digite o valor</span>
+        <button class="keyboard-close" id="keyboardClose">×</button>
+      </div>
+      <div class="keyboard-display" id="keyboardDisplay">0</div>
+      <div class="keyboard-grid" id="keyboardGrid">
+        <button class="keyboard-btn" data-digit="1">1</button>
+        <button class="keyboard-btn" data-digit="2">2</button>
+        <button class="keyboard-btn" data-digit="3">3</button>
+        <button class="keyboard-btn" data-digit="4">4</button>
+        <button class="keyboard-btn" data-digit="5">5</button>
+        <button class="keyboard-btn" data-digit="6">6</button>
+        <button class="keyboard-btn" data-digit="7">7</button>
+        <button class="keyboard-btn" data-digit="8">8</button>
+        <button class="keyboard-btn" data-digit="9">9</button>
+        <button class="keyboard-btn" id="commaBtn">,</button>
+        <button class="keyboard-btn" data-digit="0">0</button>
+        <button class="keyboard-btn" id="backspaceBtn">
+          <i class="fas fa-backspace"></i>
+        </button>
+      </div>
+      <div class="keyboard-actions">
+        <button class="keyboard-cancel" id="keyboardCancel">Cancelar</button>
+        <button class="keyboard-confirm" id="keyboardConfirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals Container -->
+  <div id="modalsContainer"></div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <i class="notification-icon fas fa-exclamation-triangle"></i>
+    <span class="notification-message" id="notificationMessage">Mensagem</span>
+    <button class="notification-close" id="notificationClose">×</button>
+  </div>
+
+  <script>
+    // App State Management
+    class AppState {
+      constructor() {
+        this.cart = [];
+        this.total = 0;
+        this.paymentMethod = '';
+        this.currentTurn = null;
+        this.keyboard = {
+          value: '',
+          target: null,
+          editingIndex: null,
+          modalContext: null
+        };
+        this.filters = {
+          turn: 'todos',
+          dateStart: '',
+          dateEnd: ''
+        };
+      }
+
+      addItem(label, price, quantity = 1) {
+        const existingItem = this.cart.find(item => 
+          item.label === label && item.price === price
+        );
+        
+        if (existingItem) {
+          existingItem.quantity += quantity;
+          const index = this.cart.indexOf(existingItem);
+          this.cart.splice(index, 1);
+          this.cart.unshift(existingItem);
+        } else {
+          this.cart.unshift({ label, price, quantity });
+        }
+        
+        this.updateTotal();
+        this.saveCart();
+        return this;
+      }
+
+      removeItem(index) {
+        if (index >= 0 && index < this.cart.length) {
+          this.cart.splice(index, 1);
+          this.updateTotal();
+          this.saveCart();
+        }
+        return this;
+      }
+
+      editItem(index, field, value) {
+        if (index >= 0 && index < this.cart.length) {
+          this.cart[index][field] = value;
+          this.updateTotal();
+          this.saveCart();
+        }
+        return this;
+      }
+
+      clearCart() {
+        this.cart = [];
+        this.total = 0;
+        this.paymentMethod = '';
+        this.saveCart();
+        return this;
+      }
+
+      updateTotal() {
+        this.total = this.cart.reduce((sum, item) => 
+          sum + (item.quantity * item.price), 0
+        );
+        return this;
+      }
+
+      saveCart() {
+        try {
+          const cartData = JSON.stringify(this.cart);
+          if (cartData !== localStorage.getItem('currentCart')) {
+            localStorage.setItem('currentCart', cartData);
+          }
+        } catch (error) {
+          console.error('Error saving cart:', error);
+        }
+        return this;
+      }
+
+      loadCart() {
+        try {
+          const saved = localStorage.getItem('currentCart');
+          if (saved) {
+            this.cart = JSON.parse(saved);
+            this.updateTotal();
+          }
+        } catch (error) {
+          console.error('Error loading cart:', error);
+          this.cart = [];
+        }
+        return this;
+      }
+    }
+
+    // DOM Manager
+    class DOMManager {
+      constructor() {
+        this.elements = new Map();
+        this.initialized = false;
+      }
+
+      init() {
+        if (this.initialized) return this;
+        
+        const elementIds = [
+          'loadingScreen', 'turnSelection', 'mainApp', 'summaryList', 
+          'totalAmount', 'receivedSection', 'receivedInput', 'changeAmount',
+          'virtualKeyboard', 'keyboardDisplay', 'keyboardTitle', 'notification',
+          'notificationMessage', 'turnInfo', 'turnText', 'modalsContainer'
+        ];
+
+        elementIds.forEach(id => {
+          const element = document.getElementById(id);
+          if (element) {
+            this.elements.set(id, element);
+          }
+        });
+
+        this.elements.set('productBtns', document.querySelectorAll('.product-btn:not(.others-btn)'));
+        this.elements.set('paymentBtns', document.querySelectorAll('.payment-btn'));
+        this.elements.set('keyboardBtns', document.querySelectorAll('.keyboard-btn[data-digit]'));
+        this.elements.set('turnBtns', document.querySelectorAll('.turn-btn'));
+
+        this.initialized = true;
+        return this;
+      }
+
+      get(id) {
+        return this.elements.get(id);
+      }
+
+      show(id, display = 'block') {
+        const element = this.get(id);
+        if (element) element.style.display = display;
+        return this;
+      }
+
+      hide(id) {
+        const element = this.get(id);
+        if (element) element.style.display = 'none';
+        return this;
+      }
+
+      addClass(id, className) {
+        const element = this.get(id);
+        if (element) element.classList.add(className);
+        return this;
+      }
+
+      removeClass(id, className) {
+        const element = this.get(id);
+        if (element) element.classList.remove(className);
+        return this;
+      }
+
+      setText(id, text) {
+        const element = this.get(id);
+        if (element) element.textContent = text;
+        return this;
+      }
+
+      setHTML(id, html) {
+        const element = this.get(id);
+        if (element) element.innerHTML = html;
+        return this;
+      }
+    }
+
+    // Event Manager
+    class EventManager {
+      constructor() {
+        this.listeners = new Map();
+        this.debounceTimers = new Map();
+      }
+
+      debounce(func, delay = 100) {
+        return (...args) => {
+          const key = func.name || 'anonymous';
+          clearTimeout(this.debounceTimers.get(key));
+          this.debounceTimers.set(key, setTimeout(() => func.apply(this, args), delay));
+        };
+      }
+
+      on(element, event, handler, options = {}) {
+        if (!element) return this;
+        
+        const wrappedHandler = options.debounce 
+          ? this.debounce(handler, options.debounce) 
+          : handler;
+        
+        element.addEventListener(event, wrappedHandler, { passive: false, ...options });
+        
+        const key = `${element.id || 'el'}-${event}`;
+        this.listeners.set(key, { element, event, handler: wrappedHandler });
+        
+        return this;
+      }
+
+      delegate(parent, selector, event, handler) {
+        if (!parent) return this;
+        
+        const delegatedHandler = (e) => {
+          const target = e.target.closest(selector);
+          if (target && parent.contains(target)) {
+            handler.call(target, e);
+          }
+        };
+
+        parent.addEventListener(event, delegatedHandler, { passive: false });
+        return this;
+      }
+    }
+
+    // Notification Manager
+    class NotificationManager {
+      constructor() {
+        this.queue = [];
+        this.current = null;
+        this.types = {
+          error: { icon: 'fas fa-exclamation-triangle', duration: 4000 },
+          warning: { icon: 'fas fa-exclamation-circle', duration: 3000 }
+        };
+      }
+
+      show(message, type = 'error') {
+        if (type !== 'error' && type !== 'warning') return;
+        
+        this.queue.push({ message, type });
+        if (!this.current) {
+          this.processQueue();
+        }
+      }
+
+      processQueue() {
+        if (this.queue.length === 0) {
+          this.current = null;
+          return;
+        }
+
+        const { message, type } = this.queue.shift();
+        this.current = { message, type };
+        
+        const notification = dom.get('notification');
+        const messageEl = dom.get('notificationMessage');
+        const iconEl = notification?.querySelector('.notification-icon');
+        
+        if (!notification || !messageEl || !iconEl) return;
+
+        const config = this.types[type] || this.types.error;
+        
+        messageEl.textContent = message;
+        iconEl.className = `notification-icon ${config.icon}`;
+        notification.className = `notification ${type} show`;
+        
+        setTimeout(() => {
+          this.hide();
+        }, config.duration);
+      }
+
+      hide() {
+        const notification = dom.get('notification');
+        if (notification) {
+          notification.classList.remove('show');
+          setTimeout(() => this.processQueue(), 300);
+        }
+      }
+    }
+
+    // Main App Class
+    class CaixaFreitas {
+      constructor() {
+        this.version = '8.3 Pro';
+        this.state = new AppState();
+        this.setupManagers();
+      }
+
+      setupManagers() {
+        window.dom = new DOMManager();
+        window.events = new EventManager();
+        window.notifications = new NotificationManager();
+      }
+
+      async init() {
+        console.log(`🥖 Caixa Freitas v${this.version} - Iniciando...`);
+        
+        try {
+          dom.init();
+          this.setupEventListeners();
+          this.setupPWA();
+          await this.hideLoadingScreen();
+          this.checkTurnStatus();
+          
+          console.log('✅ App inicializado com sucesso!');
+        } catch (error) {
+          console.error('❌ Erro na inicialização:', error);
+          notifications.show('Erro ao inicializar aplicativo', 'error');
+        }
+      }
+
+      async hideLoadingScreen() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const loading = dom.get('loadingScreen');
+            if (loading) {
+              loading.style.opacity = '0';
+              setTimeout(() => {
+                dom.hide('loadingScreen');
+                resolve();
+              }, 500);
+            } else {
+              resolve();
+            }
+          }, 800);
+        });
+      }
+
+      setupEventListeners() {
+        // Product buttons
+        dom.get('productBtns')?.forEach(btn => {
+          events.on(btn, 'click', (e) => {
+            e.preventDefault();
+            this.handleProductClick(btn);
+            this.hapticFeedback('light');
+          });
+        });
+
+        // Others button
+        events.on(document.getElementById('othersBtn'), 'click', (e) => {
+          e.preventDefault();
+          this.openKeyboard('others', 'Digite o preço do produto');
+        });
+
+        // Payment buttons
+        dom.get('paymentBtns')?.forEach(btn => {
+          events.on(btn, 'click', (e) => {
+            e.preventDefault();
+            this.selectPaymentMethod(btn.dataset.method);
+          });
+        });
+
+        // Action buttons
+        events.on(document.getElementById('clearBtn'), 'click', () => this.clearAll());
+        events.on(document.getElementById('nextBtn'), 'click', () => this.processNext());
+        events.on(document.getElementById('sangriaBtn'), 'click', () => this.openSangria());
+        events.on(document.getElementById('closeTurnBtn'), 'click', () => this.closeTurn());
+        events.on(document.getElementById('historyBtn'), 'click', () => this.openHistory());
+        events.on(document.getElementById('proHistoryBtn'), 'click', () => this.openProHistory());
+        events.on(document.getElementById('supplierBtn'), 'click', () => this.openSupplierPayment());
+
+        // Turn selection
+        dom.get('turnBtns')?.forEach(btn => {
+          events.on(btn, 'click', () => this.startTurn(btn.dataset.turn));
+        });
+
+        this.setupKeyboardEvents();
+        this.setupGlobalEvents();
+      }
+
+      setupKeyboardEvents() {
+        // Received input
+        events.on(dom.get('receivedInput'), 'click', (e) => {
+          e.preventDefault();
+          if (this.state.paymentMethod === 'Dinheiro') {
+            this.openKeyboard('received', 'Digite o valor recebido');
+          }
+        });
+
+        // Keyboard buttons
+        dom.get('keyboardBtns')?.forEach(btn => {
+          events.on(btn, 'click', (e) => {
+            e.preventDefault();
+            this.inputDigit(btn.dataset.digit);
+            this.hapticFeedback('light');
+          });
+        });
+
+        // Special keyboard buttons
+        events.on(document.getElementById('commaBtn'), 'click', () => this.inputComma());
+        events.on(document.getElementById('backspaceBtn'), 'click', () => this.backspace());
+        events.on(document.getElementById('keyboardClose'), 'click', () => this.closeKeyboard());
+        events.on(document.getElementById('keyboardCancel'), 'click', () => this.closeKeyboard());
+        events.on(document.getElementById('keyboardConfirm'), 'click', () => this.confirmKeyboard());
+
+        // Keyboard shortcuts
+        events.on(document, 'keydown', (e) => {
+          if (dom.get('virtualKeyboard')?.classList.contains('show')) {
+            this.handleKeyboardShortcut(e);
+          }
+        });
+      }
+
+      setupGlobalEvents() {
+        // Prevent context menu and selection
+        events.on(document, 'contextmenu', (e) => e.preventDefault());
+        events.on(document, 'selectstart', (e) => e.preventDefault());
+
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        events.on(document, 'touchend', (e) => {
+          const now = Date.now();
+          if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+          }
+          lastTouchEnd = now;
+        });
+
+        // Modal close on overlay click
+        events.delegate(document, '.modal-overlay', 'click', (e) => {
+          if (e.target.classList.contains('modal-overlay')) {
+            this.closeAllModals();
+          }
+        });
+
+        // Summary item interactions
+        events.delegate(dom.get('summaryList'), '.summary-item', 'click', (e) => {
+          if (e.target.closest('.delete-btn')) {
+            return;
+          }
+          
+          const item = e.target.closest('.summary-item');
+          if (item) {
+            const index = Array.from(item.parentElement.children).indexOf(item);
+            this.editItem(index);
+          }
+        });
+
+        // Delete button
+        events.delegate(dom.get('summaryList'), '.delete-btn', 'click', (e) => {
+          e.stopPropagation();
+          const item = e.target.closest('.summary-item');
+          if (item) {
+            const index = Array.from(item.parentElement.children).indexOf(item);
+            this.removeFromCart(index);
+          }
+        });
+
+        // Notification close
+        events.on(dom.get('notificationClose'), 'click', () => {
+          notifications.hide();
+        });
+      }
+
+      // Core business logic
+      handleProductClick(btn) {
+        const label = btn.dataset.label;
+        const price = parseFloat(btn.dataset.price);
+        
+        if (label && !isNaN(price)) {
+          this.state.addItem(label, price);
+          this.renderCart();
+          this.updateTotal();
+        }
+      }
+
+      addToCart(label, price, quantity = 1) {
+        this.state.addItem(label, price, quantity);
+        this.renderCart();
+        this.updateTotal();
+        this.hapticFeedback('light');
+      }
+
+      removeFromCart(index) {
+        const item = this.state.cart[index];
+        if (item) {
+          this.state.removeItem(index);
+          this.renderCart();
+          this.updateTotal();
+          this.hapticFeedback('medium');
+        }
+      }
+
+      editItem(index) {
+        if (index < 0 || index >= this.state.cart.length) return;
+        
+        this.state.keyboard.editingIndex = index;
+        const item = this.state.cart[index];
+        
+        if (item.label.toLowerCase().includes('outros')) {
+          this.openKeyboard('edit-price', `Editar preço: ${item.label}`);
+        } else {
+          this.openKeyboard('edit-quantity', `Editar quantidade: ${item.label}`);
+        }
+      }
+
+      renderCart() {
+        const summaryList = dom.get('summaryList');
+        if (!summaryList) return;
+        
+        if (this.state.cart.length === 0) {
+          dom.setHTML('summaryList', `
+            <div class="empty-cart animate-fade-in">
+              <i class="fas fa-shopping-cart"></i>
+              <p>Nenhum item adicionado</p>
+            </div>
+          `);
+          return;
+        }
+
+        const cartHTML = this.state.cart.map((item, index) => `
+          <div class="summary-item animate-slide-left" style="animation-delay: ${index * 0.1}s">
+            <div class="item-info">
+              <div class="item-label">${item.label}</div>
+              <div class="item-quantity">${item.quantity}x R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+            </div>
+            <div class="item-price">R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</div>
+            <button class="delete-btn">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `).join('');
+
+        dom.setHTML('summaryList', cartHTML);
+        
+        setTimeout(() => {
+          summaryList.scrollTop = 0;
+        }, 100);
+      }
+
+      updateTotal() {
+        this.state.updateTotal();
+        dom.setText('totalAmount', `R$ ${this.state.total.toFixed(2).replace('.', ',')}`);
+        
+        // CORREÇÃO: Atualizar valor automaticamente quando método for Cartão/PIX
+        if (this.state.paymentMethod === 'Cartão/PIX') {
+          const receivedInput = dom.get('receivedInput');
+          if (receivedInput) {
+            receivedInput.value = this.state.total.toFixed(2).replace('.', ',');
+          }
+        }
+        
+        if (this.state.paymentMethod === 'Dinheiro') {
+          this.updateChange();
+        }
+      }
+
+      selectPaymentMethod(method) {
+        if (!method || (method !== 'Dinheiro' && method !== 'Cartão/PIX')) return;
+        
+        this.state.paymentMethod = method;
+        
+        // Update UI
+        dom.get('paymentBtns')?.forEach(btn => {
+          if (btn.dataset.method === method) {
+            btn.classList.add('selected');
+          } else {
+            btn.classList.remove('selected');
+          }
+        });
+        
+        dom.addClass('receivedSection', 'show');
+        
+        const receivedInput = dom.get('receivedInput');
+        const changeAmount = dom.get('changeAmount');
+        
+        if (method === 'Cartão/PIX') {
+          if (receivedInput) {
+            receivedInput.value = this.state.total.toFixed(2).replace('.', ',');
+            receivedInput.readOnly = true;
+            receivedInput.style.background = 'linear-gradient(135deg, #e8f5e8, #c8e6c9)';
+          }
+          if (changeAmount) changeAmount.style.display = 'none';
+        } else {
+          if (receivedInput) {
+            receivedInput.value = '';
+            receivedInput.readOnly = true;
+            receivedInput.style.background = 'linear-gradient(135deg, #fff9c4, #fff59d)';
+          }
+          if (changeAmount) changeAmount.style.display = 'block';
+        }
+      }
+
+      updateChange() {
+        const receivedInput = dom.get('receivedInput');
+        const changeAmount = dom.get('changeAmount');
+        
+        if (!receivedInput || !changeAmount) return;
+        
+        const received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+        const change = received - this.state.total;
+        
+        if (change >= 0) {
+          changeAmount.textContent = `Troco: R$ ${change.toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--success)';
+        } else {
+          changeAmount.textContent = `Falta: R$ ${Math.abs(change).toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--error)';
+        }
+      }
+
+      clearAll() {
+        if (!confirm('Deseja limpar todo o carrinho?')) return;
+        
+        this.state.clearCart();
+        this.renderCart();
+        this.updateTotal();
+        
+        // Reset UI
+        dom.get('paymentBtns')?.forEach(btn => btn.classList.remove('selected'));
+        dom.removeClass('receivedSection', 'show');
+        
+        const receivedInput = dom.get('receivedInput');
+        const changeAmount = dom.get('changeAmount');
+        
+        if (receivedInput) {
+          receivedInput.value = '';
+          receivedInput.style.background = 'linear-gradient(135deg, #fff9c4, #fff59d)';
+        }
+        if (changeAmount) changeAmount.textContent = '';
+      }
+
+      processNext() {
+        if (this.state.cart.length === 0) {
+          notifications.show('Adicione itens ao carrinho', 'warning');
+          return;
+        }
+        
+        if (!this.state.paymentMethod) {
+          notifications.show('Selecione a forma de pagamento', 'warning');
+          return;
+        }
+        
+        const receivedInput = dom.get('receivedInput');
+        let received = this.state.total;
+        
+        if (this.state.paymentMethod === 'Dinheiro') {
+          if (!receivedInput || !receivedInput.value) {
+            notifications.show('Digite o valor recebido', 'warning');
+            return;
+          }
+          
+          received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+          
+          if (received < this.state.total) {
+            notifications.show('Valor recebido é menor que o total', 'error');
+            return;
+          }
+        }
+        
+        this.saveSale(received);
+        this.resetAfterSale();
+        this.hapticFeedback('success');
+      }
+
+      saveSale(received) {
+        try {
+          const now = new Date();
+          const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+          
+          const sale = {
+            id: Date.now(),
+            items: [...this.state.cart],
+            total: this.state.total,
+            paymentMethod: this.state.paymentMethod,
+            received: received,
+            change: received - this.state.total,
+            timestamp: now.toISOString(),
+            date: now.toLocaleDateString('pt-BR'),
+            time: now.toLocaleTimeString('pt-BR'),
+            turn: activeTurn
+          };
+          
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          salesHistory.unshift(sale);
+          localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
+        } catch (error) {
+          console.error('Error saving sale:', error);
+        }
+      }
+
+      resetAfterSale() {
+        this.state.clearCart();
+        this.renderCart();
+        this.updateTotal();
+        
+        // Reset UI
+        dom.get('paymentBtns')?.forEach(btn => btn.classList.remove('selected'));
+        dom.removeClass('receivedSection', 'show');
+        
+        const receivedInput = dom.get('receivedInput');
+        const changeAmount = dom.get('changeAmount');
+        
+        if (receivedInput) {
+          receivedInput.value = '';
+          receivedInput.style.background = 'linear-gradient(135deg, #fff9c4, #fff59d)';
+        }
+        if (changeAmount) changeAmount.textContent = '';
+      }
+
+      // Keyboard methods
+      openKeyboard(target, title, modalContext = null) {
+        this.state.keyboard.target = target;
+        this.state.keyboard.value = '';
+        this.state.keyboard.modalContext = modalContext;
+        
+        dom.setText('keyboardTitle', title);
+        dom.setText('keyboardDisplay', '0');
+        
+        if (!modalContext) {
+          this.closeAllModals();
+        }
+        
+        const delay = modalContext ? 0 : 100;
+        setTimeout(() => {
+          dom.addClass('virtualKeyboard', 'show');
+          document.body.style.overflow = 'hidden';
+        }, delay);
+      }
+
+      closeKeyboard() {
+        dom.removeClass('virtualKeyboard', 'show');
+        document.body.style.overflow = '';
+        
+        this.state.keyboard = { 
+          value: '', 
+          target: null, 
+          editingIndex: null, 
+          modalContext: null 
+        };
+      }
+
+      inputDigit(digit) {
+        if (!digit || isNaN(digit)) return;
+        
+        this.state.keyboard.value += digit;
+        this.updateKeyboardDisplay();
+      }
+
+      inputComma() {
+        if (!this.state.keyboard.value.includes(',') && this.state.keyboard.value.length > 0) {
+          this.state.keyboard.value += ',';
+          this.updateKeyboardDisplay();
+        }
+      }
+
+      backspace() {
+        this.state.keyboard.value = this.state.keyboard.value.slice(0, -1);
+        this.updateKeyboardDisplay();
+      }
+
+      updateKeyboardDisplay() {
+        dom.setText('keyboardDisplay', this.state.keyboard.value || '0');
+      }
+
+      confirmKeyboard() {
+        const value = parseFloat(this.state.keyboard.value.replace(',', '.'));
+        
+        if (isNaN(value) || value <= 0) {
+          notifications.show('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        switch (this.state.keyboard.target) {
+          case 'others':
+            this.addToCart('Outros', value);
+            break;
+            
+          case 'received':
+            const receivedInput = dom.get('receivedInput');
+            if (receivedInput) {
+              receivedInput.value = value.toFixed(2).replace('.', ',');
+              this.updateChange();
+            }
+            break;
+            
+          case 'edit-quantity':
+            if (this.state.keyboard.editingIndex !== null) {
+              const quantity = Math.max(1, parseInt(this.state.keyboard.value));
+              this.state.editItem(this.state.keyboard.editingIndex, 'quantity', quantity);
+              this.renderCart();
+              this.updateTotal();
+            }
+            break;
+            
+          case 'edit-price':
+            if (this.state.keyboard.editingIndex !== null) {
+              this.state.editItem(this.state.keyboard.editingIndex, 'price', value);
+              this.renderCart();
+              this.updateTotal();
+            }
+            break;
+            
+          case 'sangria':
+            this.processSangriaValue(value);
+            break;
+            
+          case 'supplier':
+            this.processSupplierValue(value);
+            break;
+        }
+        
+        this.closeKeyboard();
+      }
+
+      handleKeyboardShortcut(e) {
+        if (e.key >= '0' && e.key <= '9') {
+          e.preventDefault();
+          this.inputDigit(e.key);
+        } else if (e.key === ',' || e.key === '.') {
+          e.preventDefault();
+          this.inputComma();
+        } else if (e.key === 'Backspace') {
+          e.preventDefault();
+          this.backspace();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          this.confirmKeyboard();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          this.closeKeyboard();
+        }
+      }
+
+      // Turn management
+      checkTurnStatus() {
+        try {
+          const activeTurn = localStorage.getItem('activeTurn');
+          if (!activeTurn) {
+            dom.show('turnSelection', 'flex');
+          } else {
+            const turn = JSON.parse(activeTurn);
+            this.state.currentTurn = turn;
+            this.updateTurnInfo(turn);
+            dom.show('mainApp', 'block');
+            this.state.loadCart();
+            this.renderCart();
+          }
+        } catch (error) {
+          console.error('Error checking turn status:', error);
+          dom.show('turnSelection', 'flex');
+        }
+      }
+
+      startTurn(type) {
+        if (!type || !['manhã', 'tarde'].includes(type)) return;
+        
+        const now = new Date();
+        const turn = {
+          type: type,
+          startTime: now.toLocaleTimeString('pt-BR'),
+          startDate: now.toLocaleDateString('pt-BR'),
+          timestamp: now.toISOString(),
+          initialCash: 0
+        };
+        
+        localStorage.setItem('activeTurn', JSON.stringify(turn));
+        this.state.currentTurn = turn;
+        
+        dom.get('turnSelection').style.opacity = '0';
+        setTimeout(() => {
+          dom.hide('turnSelection');
+          this.updateTurnInfo(turn);
+          dom.show('mainApp', 'block');
+        }, 300);
+        
+        this.hapticFeedback('success');
+      }
+
+      updateTurnInfo(turn) {
+        const emoji = turn.type === 'manhã' ? '☀️' : '🌅';
+        const text = `${emoji} Turno da ${turn.type.charAt(0).toUpperCase() + turn.type.slice(1)} - ${turn.startTime}`;
+        dom.setText('turnText', text);
+      }
+
+      closeTurn() {
+        if (!confirm('Deseja realmente fechar o turno atual?')) return;
+        
+        try {
+          const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+          const now = new Date();
+          
+          const turnSummary = this.calculateTurnSummary(activeTurn);
+          
+          const closedTurn = {
+            ...activeTurn,
+            endTime: now.toLocaleTimeString('pt-BR'),
+            endDate: now.toLocaleDateString('pt-BR'),
+            endTimestamp: now.toISOString(),
+            closed: true,
+            summary: turnSummary
+          };
+          
+          const turnHistory = JSON.parse(localStorage.getItem('turnHistory') || '[]');
+          turnHistory.unshift(closedTurn);
+          localStorage.setItem('turnHistory', JSON.stringify(turnHistory));
+          
+          localStorage.removeItem('activeTurn');
+          this.resetAfterSale();
+          
+          const report = this.generateWhatsAppReport(closedTurn, turnSummary);
+          this.sendToWhatsApp(report);
+          
+          dom.hide('mainApp');
+          dom.show('turnSelection', 'flex');
+          
+          this.hapticFeedback('success');
+        } catch (error) {
+          console.error('Error closing turn:', error);
+          notifications.show('Erro ao fechar turno', 'error');
+        }
+      }
+
+      calculateTurnSummary(activeTurn) {
+        try {
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+          const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+          
+          const turnSales = salesHistory.filter(sale => 
+            sale.turn?.timestamp === activeTurn.timestamp
+          );
+          
+          const turnSangrias = sangriaHistory.filter(sangria => 
+            sangria.turn?.timestamp === activeTurn.timestamp
+          );
+          
+          const turnSuppliers = supplierHistory.filter(supplier => 
+            supplier.turn?.timestamp === activeTurn.timestamp
+          );
+          
+          const cashSales = turnSales.filter(sale => sale.paymentMethod === 'Dinheiro');
+          const cardSales = turnSales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+          
+          return {
+            totalSales: turnSales.reduce((sum, sale) => sum + sale.total, 0),
+            totalSangrias: turnSangrias.reduce((sum, sangria) => sum + sangria.amount, 0),
+            totalSuppliers: turnSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0),
+            salesCount: turnSales.length,
+            sangriaCount: turnSangrias.length,
+            supplierCount: turnSuppliers.length,
+            cashSales: cashSales.reduce((sum, sale) => sum + sale.total, 0),
+            cardSales: cardSales.reduce((sum, sale) => sum + sale.total, 0)
+          };
+        } catch (error) {
+          console.error('Error calculating turn summary:', error);
+          return {
+            totalSales: 0, totalSangrias: 0, totalSuppliers: 0,
+            salesCount: 0, sangriaCount: 0, supplierCount: 0,
+            cashSales: 0, cardSales: 0
+          };
+        }
+      }
+
+      generateWhatsAppReport(turn, summary) {
+        return `🥖 *RELATÓRIO CAIXA FREITAS v${this.version}*
+${turn.type === 'manhã' ? '☀️' : '🌅'} *Turno da ${turn.type.charAt(0).toUpperCase() + turn.type.slice(1)}*
+📅 ${turn.startDate}
+⏰ ${turn.startTime} - ${turn.endTime}
+
+💰 *RESUMO FINANCEIRO*
+💵 Vendas Dinheiro: R$ ${summary.cashSales.toFixed(2).replace('.', ',')} (${Math.floor(summary.salesCount * summary.cashSales / (summary.cashSales + summary.cardSales) || 0)} vendas)
+💳 Vendas Cartão/PIX: R$ ${summary.cardSales.toFixed(2).replace('.', ',')} (${Math.ceil(summary.salesCount * summary.cardSales / (summary.cashSales + summary.cardSales) || 0)} vendas)
+📊 Total Vendas: R$ ${summary.totalSales.toFixed(2).replace('.', ',')} (${summary.salesCount} vendas)
+🔴 Sangrias: R$ ${summary.totalSangrias.toFixed(2).replace('.', ',')} (${summary.sangriaCount} retiradas)
+🏪 Pagto Fornecedores: R$ ${summary.totalSuppliers.toFixed(2).replace('.', ',')} (${summary.supplierCount} pagamentos)
+💰 Saldo Final: R$ ${(summary.totalSales - summary.totalSangrias - summary.totalSuppliers).toFixed(2).replace('.', ',')}
+💸 Caixa Final: R$ ${(summary.cashSales - summary.totalSangrias - summary.totalSuppliers).toFixed(2).replace('.', ',')}
+
+_Relatório gerado automaticamente_`;
+      }
+
+      sendToWhatsApp(message) {
+        try {
+          const phoneNumber = '5527992259237';
+          const encodedMessage = encodeURIComponent(message);
+          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+          window.open(whatsappUrl, '_blank');
+        } catch (error) {
+          console.error('Error sending WhatsApp:', error);
+          notifications.show('Erro ao enviar relatório', 'error');
+        }
+      }
+
+      // Modal methods
+      openSangria() {
+        this.createModal('sangria', 'Sangria do Caixa', `
+          <p style="margin-bottom: 12px; color: var(--text-light);">Digite o valor da retirada:</p>
+          <input type="text" class="form-input" id="sangriaInput" placeholder="R$ 0,00" readonly style="background: #FFEBEE;">
+          <textarea class="form-textarea" id="sangriaObservation" placeholder="Observação (opcional)"></textarea>
+          <button class="action-btn next-btn" onclick="app.processSangria()" style="width: 100%;">
+            <i class="fas fa-money-bill-wave"></i>
+            Registrar Sangria
+          </button>
+        `);
+        
+        setTimeout(() => {
+          const sangriaInput = document.getElementById('sangriaInput');
+          if (sangriaInput) {
+            sangriaInput.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.openKeyboard('sangria', 'Digite o valor da sangria', 'sangria-modal');
+            });
+          }
+        }, 100);
+      }
+
+      processSangriaValue(value) {
+        const sangriaInput = document.getElementById('sangriaInput');
+        if (sangriaInput) {
+          sangriaInput.value = `R$ ${value.toFixed(2).replace('.', ',')}`;
+        }
+      }
+
+      processSangria() {
+        const sangriaInput = document.getElementById('sangriaInput');
+        const sangriaObservation = document.getElementById('sangriaObservation');
+        
+        if (!sangriaInput?.value) {
+          notifications.show('Digite o valor da sangria', 'warning');
+          return;
+        }
+        
+        const amount = parseFloat(sangriaInput.value.replace('R$ ', '').replace(',', '.'));
+        
+        if (isNaN(amount) || amount <= 0) {
+          notifications.show('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        const now = new Date();
+        const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+        
+        const sangria = {
+          id: Date.now(),
+          amount: amount,
+          observation: sangriaObservation?.value || '',
+          timestamp: now.toISOString(),
+          date: now.toLocaleDateString('pt-BR'),
+          time: now.toLocaleTimeString('pt-BR'),
+          turn: activeTurn
+        };
+        
+        const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+        sangriaHistory.unshift(sangria);
+        localStorage.setItem('sangriaHistory', JSON.stringify(sangriaHistory));
+        
+        this.closeAllModals();
+        this.hapticFeedback('success');
+      }
+
+      openSupplierPayment() {
+        this.createModal('supplier', 'Pagamento a Fornecedor', `
+          <p style="margin-bottom: 12px; color: var(--text-light);">Digite o valor pago ao fornecedor:</p>
+          <input type="text" class="form-input" id="supplierInput" placeholder="R$ 0,00" readonly style="background: #E8F5E8;">
+          <textarea class="form-textarea" id="supplierDescription" placeholder="Descrição do pagamento (ex: Fornecedor João - Compra de farinha)"></textarea>
+          <button class="action-btn next-btn" onclick="app.processSupplierPayment()" style="width: 100%;">
+            <i class="fas fa-hand-holding-usd"></i>
+            Registrar Pagamento
+          </button>
+        `);
+        
+        setTimeout(() => {
+          const supplierInput = document.getElementById('supplierInput');
+          if (supplierInput) {
+            supplierInput.addEventListener('click', (e) => {
+              e.preventDefault();
+              this.openKeyboard('supplier', 'Digite o valor do pagamento', 'supplier-modal');
+            });
+          }
+        }, 100);
+      }
+
+      processSupplierValue(value) {
+        const supplierInput = document.getElementById('supplierInput');
+        if (supplierInput) {
+          supplierInput.value = `R$ ${value.toFixed(2).replace('.', ',')}`;
+        }
+      }
+
+      processSupplierPayment() {
+        const supplierInput = document.getElementById('supplierInput');
+        const supplierDescription = document.getElementById('supplierDescription');
+        
+        if (!supplierInput?.value) {
+          notifications.show('Digite o valor do pagamento', 'warning');
+          return;
+        }
+        
+        if (!supplierDescription?.value?.trim()) {
+          notifications.show('Digite a descrição do pagamento', 'warning');
+          return;
+        }
+        
+        const amount = parseFloat(supplierInput.value.replace('R$ ', '').replace(',', '.'));
+        
+        if (isNaN(amount) || amount <= 0) {
+          notifications.show('Digite um valor válido', 'warning');
+          return;
+        }
+        
+        const now = new Date();
+        const activeTurn = JSON.parse(localStorage.getItem('activeTurn') || '{}');
+        
+        const supplierPayment = {
+          id: Date.now(),
+          amount: amount,
+          description: supplierDescription.value.trim(),
+          timestamp: now.toISOString(),
+          date: now.toLocaleDateString('pt-BR'),
+          time: now.toLocaleTimeString('pt-BR'),
+          turn: activeTurn
+        };
+        
+        const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+        supplierHistory.unshift(supplierPayment);
+        localStorage.setItem('supplierHistory', JSON.stringify(supplierHistory));
+        
+        this.closeAllModals();
+        this.hapticFeedback('success');
+      }
+
+      openHistory() {
+        const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+        
+        if (salesHistory.length === 0) {
+          notifications.show('Nenhuma venda registrada', 'warning');
+          return;
+        }
+        
+        const historyHTML = salesHistory.slice(0, 30).map(sale => `
+          <div class="summary-card" style="margin-bottom: 12px; cursor: pointer;" onclick="app.toggleSaleDetail(${sale.id})">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">${sale.time}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${sale.date}</div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+              <span style="font-size: 0.8rem; color: var(--text-light);">Pagamento: </span>
+              <span style="background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">${sale.paymentMethod}</span>
+              ${sale.paymentMethod === 'Dinheiro' && sale.change > 0 ? `<br><span style="font-size: 0.8rem; color: var(--text-light);">Troco: R$ ${sale.change.toFixed(2).replace('.', ',')}</span>` : ''}
+            </div>
+            
+            <div id="sale-detail-${sale.id}" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);">
+              <div style="margin-bottom: 8px;">
+                <strong style="font-size: 0.9rem;">Itens:</strong>
+                ${sale.items.map(item => `
+                  <div style="display: flex; justify-content: space-between; margin: 4px 0; font-size: 0.8rem;">
+                    <span>${item.quantity}x ${item.label}</span>
+                    <span>R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        this.createModal('history', 'Histórico de Vendas', historyHTML, { maxWidth: '450px', maxHeight: '80vh' });
+      }
+
+      toggleSaleDetail(saleId) {
+        const detailDiv = document.getElementById(`sale-detail-${saleId}`);
+        if (detailDiv) {
+          const isVisible = detailDiv.style.display !== 'none';
+          detailDiv.style.display = isVisible ? 'none' : 'block';
+        }
+      }
+
+      // NOVA FUNCIONALIDADE: Relatório Profissional com botões clicáveis
+      openProHistory() {
+        try {
+          this.createModal('password', 'Acesso Profissional', `
+            <p style="margin-bottom: 12px; color: var(--text-light);">Digite a senha para acessar o histórico profissional:</p>
+            <input type="password" class="form-input" id="passwordInput" placeholder="••••" maxlength="4" style="letter-spacing: 2px;">
+            <button class="action-btn next-btn" onclick="app.checkPassword()" style="width: 100%;">
+              <i class="fas fa-unlock"></i>
+              Entrar
+            </button>
+          `);
+          
+          setTimeout(() => {
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+              passwordInput.focus();
+              passwordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                  this.checkPassword();
+                }
+              });
+            }
+          }, 100);
+        } catch (error) {
+          console.error('Error opening pro history:', error);
+          notifications.show('Erro ao abrir acesso profissional', 'error');
+        }
+      }
+
+      checkPassword() {
+        try {
+          const passwordInput = document.getElementById('passwordInput');
+          if (!passwordInput) return;
+          
+          const password = passwordInput.value.trim();
+          const correctPassword = '2201';
+          
+          if (password === correctPassword) {
+            this.closeAllModals();
+            setTimeout(() => this.showProHistoryModal(), 100);
+          } else {
+            notifications.show('Senha incorreta', 'error');
+            passwordInput.value = '';
+            passwordInput.focus();
+          }
+        } catch (error) {
+          console.error('Error checking password:', error);
+          notifications.show('Erro ao verificar senha', 'error');
+        }
+      }
+
+      showProHistoryModal() {
+        try {
+          this.state.filters = {
+            turn: 'todos',
+            dateStart: '',
+            dateEnd: ''
+          };
+
+          this.createModal('proHistory', 'Relatório Profissional', `
+            <!-- Filtros de Turno -->
+            <div class="filter-controls" style="margin-bottom: 16px;">
+              <button class="filter-btn selected" id="filterTodos" onclick="app.setTurnFilter('todos')">
+                <i class="fas fa-list"></i>
+                Todos os Turnos
+              </button>
+              <button class="filter-btn" id="filterManha" onclick="app.setTurnFilter('manhã')">
+                <i class="fas fa-sun"></i>
+                Manhã
+              </button>
+            </div>
+            <div class="filter-controls" style="margin-bottom: 16px;">
+              <button class="filter-btn" id="filterTarde" onclick="app.setTurnFilter('tarde')">
+                <i class="fas fa-moon"></i>
+                Tarde
+              </button>
+              <div></div>
+            </div>
+
+            <!-- Filtros de Data -->
+            <div class="date-filter-section">
+              <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: var(--text);">
+                <i class="fas fa-calendar"></i>
+                Filtro por Data
+              </h4>
+              <div class="date-inputs">
+                <input type="date" class="date-input" id="dateStart" onchange="app.updateDateFilter()">
+                <input type="date" class="date-input" id="dateEnd" onchange="app.updateDateFilter()">
+              </div>
+              <div style="text-align: center; margin-top: 8px;">
+                <button class="filter-btn" onclick="app.setTodayFilter()" style="font-size: 0.8rem; padding: 6px 12px;">
+                  <i class="fas fa-calendar-day"></i>
+                  Hoje
+                </button>
+                <button class="filter-btn" onclick="app.clearDateFilter()" style="font-size: 0.8rem; padding: 6px 12px; margin-left: 8px;">
+                  <i class="fas fa-times"></i>
+                  Limpar
+                </button>
+              </div>
+            </div>
+
+            <!-- Resumo Financeiro com botões clicáveis -->
+            <div id="financialSummary">
+              ${this.generateFilteredFinancialSummary()}
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+              <button class="action-btn clear-btn" onclick="app.clearAllData()" style="font-size: 0.85rem; padding: 12px;">
+                <i class="fas fa-trash"></i>
+                Limpar Dados
+              </button>
+              <button class="action-btn" onclick="app.exportFilteredReport()" style="font-size: 0.85rem; padding: 12px; background: var(--text-light);">
+                <i class="fas fa-share"></i>
+                Exportar
+              </button>
+            </div>
+          `, { maxWidth: '500px', maxHeight: '85vh' });
+
+          setTimeout(() => {
+            const today = new Date().toISOString().split('T')[0];
+            const dateStart = document.getElementById('dateStart');
+            const dateEnd = document.getElementById('dateEnd');
+            if (dateStart && dateEnd) {
+              dateStart.value = today;
+              dateEnd.value = today;
+              this.state.filters.dateStart = today;
+              this.state.filters.dateEnd = today;
+              this.updateProHistoryDisplay();
+            }
+          }, 100);
+        } catch (error) {
+          console.error('Error showing pro history modal:', error);
+          notifications.show('Erro ao exibir relatório profissional', 'error');
+        }
+      }
+
+      setTurnFilter(turn) {
+        try {
+          this.state.filters.turn = turn;
+          
+          document.querySelectorAll('.filter-btn[id^="filter"]').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          
+          const activeBtn = document.getElementById(`filter${turn.charAt(0).toUpperCase() + turn.slice(1)}`);
+          if (activeBtn) {
+            activeBtn.classList.add('selected');
+          }
+          
+          this.updateProHistoryDisplay();
+        } catch (error) {
+          console.error('Error setting turn filter:', error);
+        }
+      }
+
+      updateDateFilter() {
+        try {
+          const dateStart = document.getElementById('dateStart')?.value;
+          const dateEnd = document.getElementById('dateEnd')?.value;
+          
+          this.state.filters.dateStart = dateStart || '';
+          this.state.filters.dateEnd = dateEnd || '';
+          
+          this.updateProHistoryDisplay();
+        } catch (error) {
+          console.error('Error updating date filter:', error);
+        }
+      }
+
+      setTodayFilter() {
+        try {
+          const today = new Date().toISOString().split('T')[0];
+          const dateStart = document.getElementById('dateStart');
+          const dateEnd = document.getElementById('dateEnd');
+          
+          if (dateStart && dateEnd) {
+            dateStart.value = today;
+            dateEnd.value = today;
+            this.state.filters.dateStart = today;
+            this.state.filters.dateEnd = today;
+            this.updateProHistoryDisplay();
+          }
+        } catch (error) {
+          console.error('Error setting today filter:', error);
+        }
+      }
+
+      clearDateFilter() {
+        try {
+          const dateStart = document.getElementById('dateStart');
+          const dateEnd = document.getElementById('dateEnd');
+          
+          if (dateStart && dateEnd) {
+            dateStart.value = '';
+            dateEnd.value = '';
+            this.state.filters.dateStart = '';
+            this.state.filters.dateEnd = '';
+            this.updateProHistoryDisplay();
+          }
+        } catch (error) {
+          console.error('Error clearing date filter:', error);
+        }
+      }
+
+      updateProHistoryDisplay() {
+        try {
+          const summaryEl = document.getElementById('financialSummary');
+          if (summaryEl) {
+            summaryEl.innerHTML = this.generateFilteredFinancialSummary();
+          }
+        } catch (error) {
+          console.error('Error updating pro history display:', error);
+        }
+      }
+
+      // NOVA FUNCIONALIDADE: Resumo financeiro com botões clicáveis para Sangria e Pagamentos
+      generateFilteredFinancialSummary() {
+        try {
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+          const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+          
+          const filteredSales = this.applyFilters(salesHistory);
+          const filteredSangrias = this.applyFilters(sangriaHistory);
+          const filteredSuppliers = this.applyFilters(supplierHistory);
+          
+          const cashSales = filteredSales.filter(sale => sale.paymentMethod === 'Dinheiro');
+          const cardSales = filteredSales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+          
+          const totalCash = cashSales.reduce((sum, sale) => sum + sale.total, 0);
+          const totalCard = cardSales.reduce((sum, sale) => sum + sale.total, 0);
+          const totalSangrias = filteredSangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+          const totalSuppliers = filteredSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+          const totalSales = totalCash + totalCard;
+          
+          const periodDescription = this.getPeriodDescription();
+          
+          return `
+            <h4 style="margin-bottom: 12px; color: var(--primary); text-align: center;">
+              Resumo Financeiro - ${periodDescription}
+            </h4>
+            <div class="financial-summary">
+              <div class="summary-card">
+                <div class="summary-label">Vendas Dinheiro</div>
+                <div class="summary-value cash-value">R$ ${totalCash.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${cashSales.length} vendas</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Vendas Cartão/PIX</div>
+                <div class="summary-value card-value">R$ ${totalCard.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${cardSales.length} vendas</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">Total Vendas</div>
+                <div class="summary-value" style="color: var(--primary);">R$ ${totalSales.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${filteredSales.length} vendas</div>
+              </div>
+              
+              <!-- NOVA FUNCIONALIDADE: Sangrias clicável -->
+              <div class="summary-card clickable" onclick="app.showSangriaDetails()">
+                <div class="summary-label">🔴 Sangrias <i class="fas fa-eye" style="font-size: 0.8rem;"></i></div>
+                <div class="summary-value sangria-value">R$ ${totalSangrias.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${filteredSangrias.length} retiradas</div>
+              </div>
+              
+              <!-- NOVA FUNCIONALIDADE: Pagamentos clicável -->
+              <div class="summary-card clickable" onclick="app.showSupplierDetails()">
+                <div class="summary-label">🏪 Pagamentos <i class="fas fa-eye" style="font-size: 0.8rem;"></i></div>
+                <div class="summary-value supplier-value">R$ ${totalSuppliers.toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${filteredSuppliers.length} pagamentos</div>
+              </div>
+              
+              <div class="summary-card">
+                <div class="summary-label">Saldo Final</div>
+                <div class="summary-value" style="color: var(--success); font-size: 1.3rem;">R$ ${(totalSales - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">Caixa: R$ ${(totalCash - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}</div>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error('Error generating filtered financial summary:', error);
+          return '<p>Erro ao carregar resumo financeiro</p>';
+        }
+      }
+
+      // NOVA FUNCIONALIDADE: Detalhes das Sangrias
+      showSangriaDetails() {
+        try {
+          const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+          const filteredSangrias = this.applyFilters(sangriaHistory);
+          
+          if (filteredSangrias.length === 0) {
+            notifications.show('Nenhuma sangria encontrada para o período selecionado', 'warning');
+            return;
+          }
+
+          const detailsHTML = `
+            <h4 style="margin-bottom: 16px; color: var(--error); text-align: center;">
+              <i class="fas fa-money-bill-wave"></i>
+              Detalhes das Sangrias - ${this.getPeriodDescription()}
+            </h4>
+            <div class="detail-list">
+              ${filteredSangrias.map(sangria => `
+                <div class="detail-item">
+                  <div class="detail-header">
+                    <div class="detail-amount" style="color: var(--error);">
+                      R$ ${sangria.amount.toFixed(2).replace('.', ',')}
+                    </div>
+                    <div class="detail-time">
+                      ${sangria.date} - ${sangria.time}
+                    </div>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;">
+                    ${sangria.turn?.type ? `Turno: ${sangria.turn.type}` : 'Turno não informado'}
+                  </div>
+                  ${sangria.observation ? `
+                    <div class="detail-description">
+                      <strong>Obs:</strong> ${sangria.observation}
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+            <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--border);">
+              <div style="font-size: 1.2rem; font-weight: 700; color: var(--error);">
+                Total: R$ ${filteredSangrias.reduce((sum, sangria) => sum + sangria.amount, 0).toFixed(2).replace('.', ',')}
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-light);">
+                ${filteredSangrias.length} sangria${filteredSangrias.length > 1 ? 's' : ''} registrada${filteredSangrias.length > 1 ? 's' : ''}
+              </div>
+            </div>
+          `;
+
+          this.createModal('sangriaDetails', 'Detalhes das Sangrias', detailsHTML, { maxWidth: '450px', maxHeight: '80vh' });
+        } catch (error) {
+          console.error('Error showing sangria details:', error);
+          notifications.show('Erro ao exibir detalhes das sangrias', 'error');
+        }
+      }
+
+      // NOVA FUNCIONALIDADE: Detalhes dos Pagamentos a Fornecedores
+      showSupplierDetails() {
+        try {
+          const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+          const filteredSuppliers = this.applyFilters(supplierHistory);
+          
+          if (filteredSuppliers.length === 0) {
+            notifications.show('Nenhum pagamento encontrado para o período selecionado', 'warning');
+            return;
+          }
+
+          const detailsHTML = `
+            <h4 style="margin-bottom: 16px; color: var(--primary); text-align: center;">
+              <i class="fas fa-hand-holding-usd"></i>
+              Detalhes dos Pagamentos - ${this.getPeriodDescription()}
+            </h4>
+            <div class="detail-list">
+              ${filteredSuppliers.map(supplier => `
+                <div class="detail-item">
+                  <div class="detail-header">
+                    <div class="detail-amount" style="color: var(--primary);">
+                      R$ ${supplier.amount.toFixed(2).replace('.', ',')}
+                    </div>
+                    <div class="detail-time">
+                      ${supplier.date} - ${supplier.time}
+                    </div>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;">
+                    ${supplier.turn?.type ? `Turno: ${supplier.turn.type}` : 'Turno não informado'}
+                  </div>
+                  <div class="detail-description">
+                    <strong>Descrição:</strong> ${supplier.description}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--border);">
+              <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">
+                Total: R$ ${filteredSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0).toFixed(2).replace('.', ',')}
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-light);">
+                ${filteredSuppliers.length} pagamento${filteredSuppliers.length > 1 ? 's' : ''} registrado${filteredSuppliers.length > 1 ? 's' : ''}
+              </div>
+            </div>
+          `;
+
+          this.createModal('supplierDetails', 'Detalhes dos Pagamentos', detailsHTML, { maxWidth: '450px', maxHeight: '80vh' });
+        } catch (error) {
+          console.error('Error showing supplier details:', error);
+          notifications.show('Erro ao exibir detalhes dos pagamentos', 'error');
+        }
+      }
+
+      applyFilters(data) {
+        try {
+          return data.filter(item => {
+            if (this.state.filters.turn !== 'todos') {
+              if (!item.turn || item.turn.type !== this.state.filters.turn) {
+                return false;
+              }
+            }
+            
+            if (this.state.filters.dateStart || this.state.filters.dateEnd) {
+              const itemDate = new Date(item.timestamp).toISOString().split('T')[0];
+              
+              if (this.state.filters.dateStart && itemDate < this.state.filters.dateStart) {
+                return false;
+              }
+              
+              if (this.state.filters.dateEnd && itemDate > this.state.filters.dateEnd) {
+                return false;
+              }
+            }
+            
+            return true;
+          });
+        } catch (error) {
+          console.error('Error applying filters:', error);
+          return data;
+        }
+      }
+
+      getPeriodDescription() {
+        try {
+          let description = '';
+          
+          if (this.state.filters.turn === 'manhã') {
+            description += 'Turno da Manhã';
+          } else if (this.state.filters.turn === 'tarde') {
+            description += 'Turno da Tarde';
+          } else {
+            description += 'Todos os Turnos';
+          }
+          
+          if (this.state.filters.dateStart || this.state.filters.dateEnd) {
+            if (this.state.filters.dateStart === this.state.filters.dateEnd && this.state.filters.dateStart) {
+              const date = new Date(this.state.filters.dateStart).toLocaleDateString('pt-BR');
+              description += ` - ${date}`;
+            } else {
+              const startDate = this.state.filters.dateStart 
+                ? new Date(this.state.filters.dateStart).toLocaleDateString('pt-BR') 
+                : 'início';
+              const endDate = this.state.filters.dateEnd 
+                ? new Date(this.state.filters.dateEnd).toLocaleDateString('pt-BR') 
+                : 'hoje';
+              description += ` - ${startDate} até ${endDate}`;
+            }
+          }
+          
+          return description;
+        } catch (error) {
+          console.error('Error getting period description:', error);
+          return 'Período';
+        }
+      }
+
+      exportFilteredReport() {
+        try {
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          const sangriaHistory = JSON.parse(localStorage.getItem('sangriaHistory') || '[]');
+          const supplierHistory = JSON.parse(localStorage.getItem('supplierHistory') || '[]');
+          
+          const filteredSales = this.applyFilters(salesHistory);
+          const filteredSangrias = this.applyFilters(sangriaHistory);
+          const filteredSuppliers = this.applyFilters(supplierHistory);
+          
+          const cashSales = filteredSales.filter(sale => sale.paymentMethod === 'Dinheiro');
+          const cardSales = filteredSales.filter(sale => sale.paymentMethod === 'Cartão/PIX');
+          
+          const totalCash = cashSales.reduce((sum, sale) => sum + sale.total, 0);
+          const totalCard = cardSales.reduce((sum, sale) => sum + sale.total, 0);
+          const totalSangrias = filteredSangrias.reduce((sum, sangria) => sum + sangria.amount, 0);
+          const totalSuppliers = filteredSuppliers.reduce((sum, supplier) => sum + supplier.amount, 0);
+          
+          const periodDescription = this.getPeriodDescription();
+          
+          const report = `🥖 *RELATÓRIO CAIXA FREITAS v${this.version}*
+📊 ${periodDescription}
+
+💰 *RESUMO FINANCEIRO*
+💵 Vendas Dinheiro: R$ ${totalCash.toFixed(2).replace('.', ',')} (${cashSales.length} vendas)
+💳 Vendas Cartão/PIX: R$ ${totalCard.toFixed(2).replace('.', ',')} (${cardSales.length} vendas)
+📊 Total Vendas: R$ ${(totalCash + totalCard).toFixed(2).replace('.', ',')} (${filteredSales.length} vendas)
+🔴 Sangrias: R$ ${totalSangrias.toFixed(2).replace('.', ',')} (${filteredSangrias.length} retiradas)
+🏪 Pagto Fornecedores: R$ ${totalSuppliers.toFixed(2).replace('.', ',')} (${filteredSuppliers.length} pagamentos)
+💰 Saldo Final: R$ ${(totalCash + totalCard - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}
+💸 Caixa Final: R$ ${(totalCash - totalSangrias - totalSuppliers).toFixed(2).replace('.', ',')}
+
+_Relatório filtrado gerado pelo Caixa Freitas v${this.version}_`;
+
+          this.sendToWhatsApp(report);
+        } catch (error) {
+          console.error('Error exporting filtered report:', error);
+          notifications.show('Erro ao exportar relatório', 'error');
+        }
+      }
+
+      clearAllData() {
+        try {
+          if (!confirm('ATENÇÃO: Isso irá apagar TODOS os dados do sistema. Esta ação não pode ser desfeita. Deseja continuar?')) {
+            return;
+          }
+          
+          const keysToRemove = [
+            'salesHistory', 
+            'sangriaHistory', 
+            'supplierHistory', 
+            'turnHistory', 
+            'currentCart'
+          ];
+          
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          
+          this.resetAfterSale();
+          this.closeAllModals();
+        } catch (error) {
+          console.error('Error clearing data:', error);
+          notifications.show('Erro ao limpar dados', 'error');
+        }
+      }
+
+      // Modal system
+      createModal(id, title, content, options = {}) {
+        try {
+          if (dom.get('virtualKeyboard')?.classList.contains('show')) {
+            this.closeKeyboard();
+          }
+          
+          const modal = document.createElement('div');
+          modal.className = 'modal-overlay show';
+          modal.id = `modal-${id}`;
+          
+          const maxWidth = options.maxWidth || '400px';
+          const maxHeight = options.maxHeight || '80vh';
+          
+          modal.innerHTML = `
+            <div class="modal" style="max-width: ${maxWidth}; max-height: ${maxHeight};">
+              <div class="modal-header">
+                <h3 class="modal-title">${title}</h3>
+                <button class="modal-close" onclick="app.closeAllModals()">×</button>
+              </div>
+              <div class="modal-body" style="max-height: calc(${maxHeight} - 100px); overflow-y: auto;">
+                ${content}
+              </div>
+            </div>
+          `;
+          
+          const container = dom.get('modalsContainer');
+          if (container) {
+            container.appendChild(modal);
+          } else {
+            document.body.appendChild(modal);
+          }
+          
+          modal.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+              this.closeAllModals();
+            }
+          });
+          
+          return modal;
+        } catch (error) {
+          console.error('Error creating modal:', error);
+          notifications.show('Erro ao abrir modal', 'error');
+        }
+      }
+
+      closeAllModals() {
+        try {
+          const modals = document.querySelectorAll('.modal-overlay');
+          modals.forEach(modal => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+          });
+        } catch (error) {
+          console.error('Error closing modals:', error);
+        }
+      }
+
+      // Utility methods
+      hapticFeedback(type = 'light') {
+        if (!('vibrate' in navigator)) return;
+        
+        try {
+          switch (type) {
+            case 'light':
+              navigator.vibrate(8);
+              break;
+            case 'medium':
+              navigator.vibrate(15);
+              break;
+            case 'success':
+              navigator.vibrate([30, 30, 60]);
+              break;
+            case 'error':
+              navigator.vibrate([60, 30, 60, 30, 60]);
+              break;
+            default:
+              navigator.vibrate(10);
+          }
+        } catch (error) {
+          // Vibration not supported
+        }
+      }
+
+      setupPWA() {
+        try {
+          const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                              window.navigator.standalone === true ||
+                              document.referrer.includes('android-app://');
+          
+          if (isStandalone) {
+            console.log('✅ Running as PWA');
+            document.documentElement.classList.add('pwa-mode');
+            
+            window.addEventListener('load', () => {
+              setTimeout(() => {
+                window.scrollTo(0, 1);
+              }, 0);
+            });
+            
+            document.body.addEventListener('touchstart', e => {
+              if (e.touches.length === 1 && e.touches[0].clientY <= 50) {
+                e.preventDefault();
+              }
+            }, { passive: false });
+            
+            document.body.addEventListener('touchmove', e => {
+              if (e.touches.length === 1 && e.touches[0].clientY <= 50) {
+                e.preventDefault();
+              }
+            }, { passive: false });
+            
+            return;
+          }
+          
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                  console.log('✅ SW registered successfully');
+                })
+                .catch(registrationError => {
+                  console.log('❌ SW registration failed:', registrationError);
+                });
+            });
+          }
+          
+          let deferredPrompt;
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('💾 PWA install prompt available');
+          });
+          
+          window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA was installed');
+            deferredPrompt = null;
+          });
+          
+          if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            document.addEventListener('touchmove', function(e) {
+              if (e.scale !== 1) { e.preventDefault(); }
+            }, { passive: false });
+            
+            document.addEventListener('touchstart', function() {}, { passive: true });
+          }
+          
+        } catch (error) {
+          console.error('PWA setup error:', error);
+        }
+      }
+    }
+
+    // Initialize app
+    let app;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        app = new CaixaFreitas();
+        app.init();
+        
+        window.app = app;
+      } catch (error) {
+        console.error('❌ App initialization failed:', error);
+        document.body.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center;">
+            <h1 style="color: #E53935; margin-bottom: 20px;">Erro ao Inicializar</h1>
+            <p style="margin-bottom: 20px;">O aplicativo não pôde ser carregado corretamente.</p>
+            <button onclick="location.reload()" style="padding: 15px 30px; background: #4a1a2e; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+              Recarregar Aplicativo
+            </button>
+          </div>
+        `;
+      }
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (app) {
+        if (app.cleanup) app.cleanup();
+      }
+    });
+
+    // Enhanced error handling
+    window.addEventListener('error', (event) => {
+      console.error('❌ Global error:', event.error);
+      if (window.notifications) {
+        notifications.show('Erro inesperado. Recarregue se necessário.', 'error');
+      }
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('❌ Unhandled promise rejection:', event.reason);
+      event.preventDefault();
+      if (window.notifications) {
+        notifications.show('Erro de processamento detectado.', 'error');
+      }
+    });
+
+    // PWA specific event listeners
+    window.addEventListener('online', () => {
+      console.log('🌐 Connection restored');
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('📵 Connection lost - working offline');
+    });
+
+    // Prevent zoom on iOS
+    document.addEventListener('gesturestart', function (e) {
+      e.preventDefault();
+    });
+
+    console.log('🚀 Caixa Freitas v8.3 Pro - Sistema OTIMIZADO carregado com sucesso!');
+    console.log('🔧 Melhorias aplicadas:');
+    console.log('   ✅ Sangrias e Pagamentos agora são botões clicáveis com detalhes');
+    console.log('   ✅ Correção do valor não atualizar automaticamente no Cartão/PIX');
+    console.log('   ✅ Código otimizado e mais enxuto');
+    console.log('   ✅ Performance melhorada para evitar travamentos');
+    console.log('   ✅ Interface mais profissional e responsiva');
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'caixa-freitas-v8.3-pro';
+        const urlsToCache = [
+          '/',
+          '/index.html',
+          'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
+          'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+        ];
+
+        self.addEventListener('install', function(event) {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                return cache.addAll(urlsToCache);
+              })
+          );
+        });
+
+        self.addEventListener('fetch', function(event) {
+          event.respondWith(
+            caches.match(event.request)
+              .then(function(response) {
+                if (response) {
+                  return response;
+                }
+                return fetch(event.request);
+              }
+            )
+          );
+        });
+      `;
+
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+
+      navigator.serviceWorker.register(swUrl)
+        .then(function(registration) {
+          console.log('✅ SW registered with inline code');
+        })
+        .catch(function(error) {
+          console.log('❌ SW registration failed:', error);
+        });
+    }
+  </script>
+
+  <!-- Manifest JSON inline for PWA -->
+  <script>
+    const manifest = {
+      "name": "Super Caixa Freitas Pro",
+      "short_name": "Caixa Freitas",
+      "description": "Sistema profissional de ponto de venda para padaria",
+      "start_url": "/",
+      "display": "standalone",
+      "background_color": "#4a1a2e",
+      "theme_color": "#4a1a2e",
+      "orientation": "portrait-primary",
+      "categories": ["business", "finance"],
+      "lang": "pt-BR",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkY8L3RleHQ+Cjwvc3ZnPgo=",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        },
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iMjU2IiB5PSIzMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI5NiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5GPC90ZXh0Pgo8L3N2Zz4K",
+          "sizes": "512x512",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    
+    const linkElement = document.createElement('link');
+    linkElement.rel = 'manifest';
+    linkElement.href = manifestURL;
+    document.head.appendChild(linkElement);
+  </script>
+</body>
+</html>: var(--text-light);">ID: ${sale.id}</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">R$ ${sale.total.toFixed(2).replace('.', ',')}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.8rem; color
+        
