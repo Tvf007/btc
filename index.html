@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Caixa Freitas">
+  <meta name="theme-color" content="#4a1a2e">
+  <title>Super Caixa Freitas v8.4 Pro</title>
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM1ODAwMjEiLz4KPHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkY8L3RleHQ+Cjwvc3ZnPgo=">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #4a1a2e;
+      --primary-dark: #2d0f1c;
+      --secondary: #43A047;
+      --error: #E53935;
+      --warning: #FF9800;
+      --success: #28a745;
+      --surface: #FFFFFF;
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --text-light: #6c757d;
+      --border: #dee2e6;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --spacing: 16px;
+      --z-loading: 10000;
+      --z-modal: 15000;
+      --z-notification: 20000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      position: fixed;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    * {
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+
+    button, .clickable {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      will-change: transform;
+    }
+
+    button:active, .clickable:active {
+      transform: scale(0.95);
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: var(--z-loading);
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-logo {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 10px var(--spacing);
+      position: relative;
+      box-shadow: 0 2px 10px rgba(74, 26, 46, 0.2);
+      border-radius: 0 0 16px 16px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .turno-info {
+      font-size: 0.75rem;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.15);
+      padding: 3px 8px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      margin-top: 6px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 8px;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .product-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      box-shadow: 0 2px 8px rgba(74, 26, 46, 0.2);
+      position: relative;
+      overflow: hidden;
+      min-height: 65px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+    }
+
+    .product-btn:active {
+      transform: scale(0.95);
+    }
+
+    .product-btn .price {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    .others-btn {
+      background: linear-gradient(135deg, var(--warning), #F57C00);
+      position: relative;
+    }
+
+    .others-btn::after {
+      content: '+';
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    /* Summary Section */
+    .summary-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .summary-list {
+      min-height: 120px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      margin-bottom: 4px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.1s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .summary-item:active {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+
+    .item-quantity {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.9rem;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--error);
+      padding: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      font-size: 0.85rem;
+      z-index: 10;
+    }
+
+    .delete-btn:active {
+      background: #ffebee;
+      transform: scale(1.1);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 20px 10px;
+      color: var(--text-light);
+    }
+
+    .empty-cart i {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    /* Total Section */
+    .total-amount {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: linear-gradient(135deg, #fff, #f8f9fa);
+    }
+
+    /* Payment Methods */
+    .payment-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .payment-btn {
+      background: linear-gradient(135deg, #ffffff, #f1f3f4);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.9rem;
+      position: relative;
+      min-height: 50px;
+    }
+
+    .payment-btn.selected {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+      border-color: var(--success);
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .payment-btn:active:not(.selected) {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: scale(0.98);
+    }
+
+    /* Received Section */
+    .received-section {
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .received-section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .received-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.2rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+    }
+
+    .change-amount {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--success);
+      margin-top: 8px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .action-buttons-row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 0;
+    }
+
+    .action-btn {
+      padding: 12px 10px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      min-height: 50px;
+    }
+
+    .next-btn {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 800;
+      grid-row: 1;
+      grid-column: 1;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .clear-btn {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+    }
+
+    .payment-supplier-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-size: 0.75rem;
+    }
+
+    .sangria-btn {
+      background: linear-gradient(135deg, var(--warning), #F57C00);
+      color: white;
+      font-size: 0.75rem;
+    }
+
+    .close-turn-btn {
+      background: linear-gradient(135deg, var(--text-light), #424242);
+      color: white;
+      font-size: 0.75rem;
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* History Buttons */
+    .history-btn {
+      background: linear-gradient(135deg, var(--text-light), #424242);
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      touch-action: manipulation;
+      box-shadow: var(--shadow);
+      font-size: 0.8rem;
+      min-height: 50px;
+    }
+
+    .history-btn.pro {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    /* Turn Selection */
+    .turn-selection {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: var(--z-loading);
+      color: white;
+      padding: 20px;
+    }
+
+    .turn-logo {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .turn-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .turn-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .turn-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .turn-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 160px;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    .turn-btn:active {
+      background: rgba(255,255,255,0.3);
+      transform: scale(0.95);
+    }
+
+    .turn-emoji {
+      font-size: 1.5rem;
+    }
+
+    /* Virtual Keyboard */
+    .virtual-keyboard {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(74, 26, 46, 0.98), rgba(45, 15, 28, 0.98));
+      backdrop-filter: blur(15px);
+      padding: 20px;
+      z-index: 16000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .virtual-keyboard.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .keyboard-container {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: slideInKeyboard 0.3s ease-out;
+      z-index: 16001;
+    }
+
+    @keyframes slideInKeyboard {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .keyboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .keyboard-title {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .keyboard-close {
+      background: var(--error);
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: all 0.1s;
+      touch-action: manipulation;
+      font-weight: bold;
+    }
+
+    .keyboard-close:active {
+      background: #d32f2f;
+      transform: scale(0.9);
+    }
+
+    .keyboard-display {
+      background: linear-gradient(135deg, #fff9c4, #fff59d);
+      padding: 16px;
+      border-radius: var(--radius);
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 16px;
+      border: 3px solid #f9a825;
+      letter-spacing: 2px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .keyboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .keyboard-btn {
+      aspect-ratio: 1;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      box-shadow: 0 4px 12px rgba(74, 26, 46, 0.3);
+      min-height: 60px;
+    }
+
+    .keyboard-btn:active {
+      background: linear-gradient(135deg, var(--primary-dark), #1a0b14);
+      transform: scale(0.95);
+    }
+
+    .keyboard-actions {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 12px;
+    }
+
+    .keyboard-cancel,
+    .keyboard-confirm {
+      border: none;
+      border-radius: var(--radius);
+      padding: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.1s;
+      touch-action: manipulation;
+      font-size: 1rem;
+    }
+
+    .keyboard-cancel {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+    }
+
+    .keyboard-confirm {
+      background: linear-gradient(135deg, var(--success), #218838);
+      color: white;
+    }
+
+    .keyboard-cancel:active,
+    .keyboard-confirm:active {
+      transform: scale(0.95);
+    }
+
+    /* Notification System */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: var(--z-notification);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 90vw;
+      opacity: 0;
+      transform: translateX(-50%) translateY(-30px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+      background: #fdf2f2;
+    }
+
+    .notification.warning {
+      border-left: 4px solid var(--warning);
+      background: #fffbf0;
+    }
+
+    .notification-icon {
+      font-size: 1.3rem;
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error);
+    }
+
+    .notification.warning .notification-icon {
+      color: var(--warning);
+    }
+
+    .notification-message {
+      flex: 1;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.1s;
+      touch-action: manipulation;
+    }
+
+    .notification-close:active {
+      background: var(--border);
+      transform: scale(0.9);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .container {
+        padding: 6px;
+        gap: 6px;
+      }
+
+      .card {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 8px var(--spacing);
+      }
+
+      .header h1 {
+        font-size: 1.2rem;
+      }
+
+      .total-amount {
+        font-size: 1.3rem;
+        padding: 8px;
+      }
+
+      .turn-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 250px;
+      }
+
+      .keyboard-container {
+        padding: 15px;
+      }
+
+      .keyboard-grid {
+        gap: 8px;
+      }
+
+      .keyboard-btn {
+        min-height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (display-mode: standalone) {
+      body {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      html {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">F</div>
+    <div class="loading-text">Carregando Caixa Freitas v8.4...</div>
+  </div>
+
+  <!-- Turn Selection -->
+  <div class="turn-selection" id="turnSelection" style="display: none;">
+    <div class="turn-logo">F</div>
+    <h2 class="turn-title">Bem-vindo ao Caixa Freitas</h2>
+    <p class="turn-subtitle">Selecione o turno para começar</p>
+    <div class="turn-buttons">
+      <button class="turn-btn" onclick="app.startTurn('morning')">
+        <span class="turn-emoji">☀️</span>
+        Turno da Manhã
+      </button>
+      <button class="turn-btn" onclick="app.startTurn('afternoon')">
+        <span class="turn-emoji">🌅</span>
+        Turno da Tarde
+      </button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" style="display: none;">
+    <!-- Header -->
+    <header class="header">
+      <h1>Caixa Freitas</h1>
+      <div class="turno-info" id="turnInfo">
+        <i class="fas fa-clock"></i>
+        <span id="turnText">Carregando...</span>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Products Section -->
+      <section class="card">
+        <h3 class="section-title">
+          <i class="fas fa-bread-slice"></i>
+          Produtos
+        </h3>
+        <div class="products-grid" id="productsGrid">
+          <button class="product-btn" onclick="app.addProduct('Pão de Sal', 0.70)">
+            <span>Pão de Sal</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" onclick="app.addProduct('Pão Doce Comum', 0.70)">
+            <span>Pão Doce Comum</span>
+            <span class="price">R$ 0,70</span>
+          </button>
+          <button class="product-btn" onclick="app.addProduct('Pão Doce Especial', 0.80)">
+            <span>Pão Doce Especial</span>
+            <span class="price">R$ 0,80</span>
+          </button>
+          <button class="product-btn others-btn" onclick="app.openKeyboard('others')">
+            <span>Outros</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section class="card summary-section">
+        <h3 class="section-title">
+          <i class="fas fa-shopping-cart"></i>
+          Pedido
+        </h3>
+        
+        <div class="summary-list" id="summaryList">
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Nenhum item adicionado</p>
+          </div>
+        </div>
+
+        <div class="total-section">
+          <div class="total-amount">
+            Total: <span id="totalAmount">R$ 0,00</span>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="payment-section">
+            <h4 class="section-title">
+              <i class="fas fa-credit-card"></i>
+              Pagamento
+            </h4>
+            <div class="payment-methods">
+              <button class="payment-btn" onclick="app.selectPayment('Cash')">
+                <i class="fas fa-money-bill-wave"></i>
+                Dinheiro
+              </button>
+              <button class="payment-btn" onclick="app.selectPayment('Card/PIX')">
+                <i class="fas fa-credit-card"></i>
+                Cartão/PIX
+              </button>
+            </div>
+          </div>
+
+          <!-- Received Amount -->
+          <div class="received-section" id="receivedSection">
+            <input type="text" class="received-input" id="receivedInput" placeholder="Valor recebido" readonly onclick="app.openReceivedKeyboard()">
+            <div class="change-amount" id="changeAmount" style="display: none;"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn next-btn" onclick="app.processNext()">
+              <i class="fas fa-check"></i>
+              Próximo Cliente
+            </button>
+            <button class="action-btn clear-btn" onclick="app.clearCart()">
+              <i class="fas fa-trash"></i>
+              Limpar
+            </button>
+            <button class="action-btn payment-supplier-btn" onclick="app.showMessage('Funcionalidade em desenvolvimento')">
+              <i class="fas fa-hand-holding-usd"></i>
+              Pagamento
+            </button>
+          </div>
+
+          <div class="action-buttons-row2">
+            <button class="action-btn sangria-btn" onclick="app.showMessage('Funcionalidade em desenvolvimento')">
+              <i class="fas fa-money-bill-wave"></i>
+              Sangria
+            </button>
+            <button class="action-btn close-turn-btn" onclick="app.closeTurn()">
+              <i class="fas fa-times"></i>
+              Fechar
+            </button>
+            <button class="history-btn" onclick="app.showMessage('Funcionalidade em desenvolvimento')">
+              <i class="fas fa-history"></i>
+              Histórico
+            </button>
+            <button class="history-btn pro" onclick="app.showMessage('Funcionalidade em desenvolvimento')">
+              <i class="fas fa-chart-line"></i>
+              Pro
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Virtual Keyboard -->
+  <div class="virtual-keyboard" id="virtualKeyboard">
+    <div class="keyboard-container">
+      <div class="keyboard-header">
+        <span class="keyboard-title" id="keyboardTitle">Inserir valor</span>
+        <button class="keyboard-close" onclick="app.closeKeyboard()">×</button>
+      </div>
+      <div class="keyboard-display" id="keyboardDisplay">0</div>
+      <div class="keyboard-grid">
+        <button class="keyboard-btn" onclick="app.inputDigit('1')">1</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('2')">2</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('3')">3</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('4')">4</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('5')">5</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('6')">6</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('7')">7</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('8')">8</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('9')">9</button>
+        <button class="keyboard-btn" onclick="app.inputComma()">,</button>
+        <button class="keyboard-btn" onclick="app.inputDigit('0')">0</button>
+        <button class="keyboard-btn" onclick="app.backspace()">
+          <i class="fas fa-backspace"></i>
+        </button>
+      </div>
+      <div class="keyboard-actions">
+        <button class="keyboard-cancel" onclick="app.closeKeyboard()">Cancelar</button>
+        <button class="keyboard-confirm" onclick="app.confirmKeyboard()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <i class="notification-icon fas fa-exclamation-triangle"></i>
+    <span class="notification-message" id="notificationMessage">Mensagem</span>
+    <button class="notification-close" onclick="app.hideNotification()">×</button>
+  </div>
+
+  <script>
+    class CaixaFreitas {
+      constructor() {
+        this.version = '8.4 Pro';
+        this.cart = [];
+        this.total = 0;
+        this.paymentMethod = '';
+        this.currentTurn = null;
+        this.keyboard = {
+          value: '',
+          target: null,
+          display: null
+        };
+        
+        // Sistema de cliques rápidos - SEM debounce
+        this.isProcessing = false;
+      }
+
+      async init() {
+        console.log(`🥖 Caixa Freitas v${this.version} - Iniciando...`);
+        
+        try {
+          // Inicialização rápida
+          await this.hideLoadingScreen();
+          this.checkTurnStatus();
+          this.setupEventListeners();
+          console.log('✅ App inicializado com sucesso!');
+        } catch (error) {
+          console.error('❌ Erro na inicialização:', error);
+          this.showNotification('Erro ao inicializar aplicação', 'error');
+        }
+      }
+
+      async hideLoadingScreen() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const loading = document.getElementById('loadingScreen');
+            if (loading) {
+              loading.style.opacity = '0';
+              setTimeout(() => {
+                loading.style.display = 'none';
+                resolve();
+              }, 500);
+            } else {
+              resolve();
+            }
+          }, 1000); // 1 segundo para mostrar o loading
+        });
+      }
+
+      checkTurnStatus() {
+        try {
+          const savedTurn = localStorage.getItem('activeTurn');
+          if (savedTurn) {
+            this.currentTurn = JSON.parse(savedTurn);
+            this.updateTurnInfo(this.currentTurn);
+            document.getElementById('mainApp').style.display = 'block';
+            this.loadCart();
+          } else {
+            document.getElementById('turnSelection').style.display = 'flex';
+          }
+        } catch (error) {
+          console.error('Erro ao verificar status do turno:', error);
+          document.getElementById('turnSelection').style.display = 'flex';
+        }
+      }
+
+      startTurn(type) {
+        const now = new Date();
+        const turn = {
+          type: type,
+          startTime: now.toLocaleTimeString('pt-BR'),
+          startDate: now.toLocaleDateString('pt-BR'),
+          timestamp: now.toISOString()
+        };
+        
+        localStorage.setItem('activeTurn', JSON.stringify(turn));
+        this.currentTurn = turn;
+        
+        document.getElementById('turnSelection').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('turnSelection').style.display = 'none';
+          this.updateTurnInfo(turn);
+          document.getElementById('mainApp').style.display = 'block';
+        }, 300);
+        
+        this.hapticFeedback();
+      }
+
+      updateTurnInfo(turn) {
+        const emoji = turn.type === 'morning' ? '☀️' : '🌅';
+        const turnName = turn.type === 'morning' ? 'Manhã' : 'Tarde';
+        const text = `${emoji} Turno da ${turnName} - ${turn.startTime}`;
+        document.getElementById('turnText').textContent = text;
+      }
+
+      // SISTEMA DE CLIQUES RÁPIDOS - Execução imediata
+      addProduct(label, price) {
+        // Execução imediata sem qualquer delay
+        const existingItem = this.cart.find(item => 
+          item.label === label && item.price === price
+        );
+        
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          this.cart.push({ label, price, quantity: 1 });
+        }
+        
+        this.updateDisplay();
+        this.hapticFeedback();
+      }
+
+      removeItem(index) {
+        if (index >= 0 && index < this.cart.length) {
+          this.cart.splice(index, 1);
+          this.updateDisplay();
+          this.hapticFeedback();
+        }
+      }
+
+      updateDisplay() {
+        this.renderCart();
+        this.updateTotal();
+        this.saveCart();
+      }
+
+      renderCart() {
+        const summaryList = document.getElementById('summaryList');
+        
+        if (this.cart.length === 0) {
+          summaryList.innerHTML = `
+            <div class="empty-cart">
+              <i class="fas fa-shopping-cart"></i>
+              <p>Nenhum item adicionado</p>
+            </div>
+          `;
+          return;
+        }
+
+        const cartHTML = this.cart.map((item, index) => `
+          <div class="summary-item" onclick="app.editItem(${index})">
+            <div class="item-info">
+              <div class="item-label">${item.label}</div>
+              <div class="item-quantity">${item.quantity}x R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+            </div>
+            <div class="item-price">R$ ${(item.quantity * item.price).toFixed(2).replace('.', ',')}</div>
+            <button class="delete-btn" onclick="event.stopPropagation(); app.removeItem(${index})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `).join('');
+
+        summaryList.innerHTML = cartHTML;
+      }
+
+      updateTotal() {
+        this.total = this.cart.reduce((sum, item) => 
+          sum + (item.quantity * item.price), 0
+        );
+        
+        document.getElementById('totalAmount').textContent = 
+          `R$ ${this.total.toFixed(2).replace('.', ',')}`;
+        
+        if (this.paymentMethod === 'Card/PIX') {
+          const receivedInput = document.getElementById('receivedInput');
+          if (receivedInput) {
+            receivedInput.value = this.total.toFixed(2).replace('.', ',');
+          }
+        }
+        
+        if (this.paymentMethod === 'Cash') {
+          this.updateChange();
+        }
+      }
+
+      selectPayment(method) {
+        this.paymentMethod = method;
+        
+        // Update UI
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+        
+        event.target.classList.add('selected');
+        
+        const receivedSection = document.getElementById('receivedSection');
+        receivedSection.classList.add('show');
+        
+        const receivedInput = document.getElementById('receivedInput');
+        const changeAmount = document.getElementById('changeAmount');
+        
+        if (method === 'Card/PIX') {
+          receivedInput.value = this.total.toFixed(2).replace('.', ',');
+          receivedInput.style.background = 'linear-gradient(135deg, #e8f5e8, #c8e6c9)';
+          changeAmount.style.display = 'none';
+        } else {
+          receivedInput.value = '';
+          receivedInput.style.background = 'linear-gradient(135deg, #fff9c4, #fff59d)';
+          changeAmount.style.display = 'block';
+        }
+      }
+
+      updateChange() {
+        const receivedInput = document.getElementById('receivedInput');
+        const changeAmount = document.getElementById('changeAmount');
+        
+        if (!receivedInput || !changeAmount) return;
+        
+        const received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+        const change = received - this.total;
+        
+        if (change >= 0) {
+          changeAmount.textContent = `Troco: R$ ${change.toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--success)';
+        } else {
+          changeAmount.textContent = `Falta: R$ ${Math.abs(change).toFixed(2).replace('.', ',')}`;
+          changeAmount.style.color = 'var(--error)';
+        }
+      }
+
+      clearCart() {
+        if (!confirm('Deseja limpar todo o carrinho?')) return;
+        
+        this.cart = [];
+        this.total = 0;
+        this.paymentMethod = '';
+        this.updateDisplay();
+        
+        // Reset UI
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+        document.getElementById('receivedSection').classList.remove('show');
+        
+        const receivedInput = document.getElementById('receivedInput');
+        const changeAmount = document.getElementById('changeAmount');
+        
+        if (receivedInput) {
+          receivedInput.value = '';
+          receivedInput.style.background = 'linear-gradient(135deg, #fff9c4, #fff59d)';
+        }
+        if (changeAmount) changeAmount.textContent = '';
+      }
+
+      processNext() {
+        if (this.cart.length === 0) {
+          this.showNotification('Adicione itens ao carrinho', 'warning');
+          return;
+        }
+        
+        if (!this.paymentMethod) {
+          this.showNotification('Selecione a forma de pagamento', 'warning');
+          return;
+        }
+        
+        const receivedInput = document.getElementById('receivedInput');
+        let received = this.total;
+        
+        if (this.paymentMethod === 'Cash') {
+          if (!receivedInput || !receivedInput.value) {
+            this.showNotification('Informe o valor recebido', 'warning');
+            return;
+          }
+          
+          received = parseFloat(receivedInput.value.replace(',', '.')) || 0;
+          
+          if (received < this.total) {
+            this.showNotification('Valor recebido é menor que o total', 'error');
+            return;
+          }
+        }
+        
+        this.saveSale(received);
+        this.clearCart();
+        this.showNotification('Venda processada com sucesso!', 'success');
+        this.hapticFeedback();
+      }
+
+      saveSale(received) {
+        try {
+          const now = new Date();
+          const sale = {
+            id: Date.now(),
+            items: [...this.cart],
+            total: this.total,
+            paymentMethod: this.paymentMethod,
+            received: received,
+            change: received - this.total,
+            timestamp: now.toISOString(),
+            date: now.toLocaleDateString('pt-BR'),
+            time: now.toLocaleTimeString('pt-BR'),
+            turn: this.currentTurn
+          };
+          
+          const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+          salesHistory.unshift(sale);
+          localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
+        } catch (error) {
+          console.error('Erro ao salvar venda:', error);
+        }
+      }
+
+      saveCart() {
+        try {
+          localStorage.setItem('currentCart', JSON.stringify(this.cart));
+        } catch (error) {
+          console.error('Erro ao salvar carrinho:', error);
+        }
+      }
+
+      loadCart() {
+        try {
+          const saved = localStorage.getItem('currentCart');
+          if (saved) {
+            this.cart = JSON.parse(saved);
+            this.updateDisplay();
+          }
+        } catch (error) {
+          console.error('Erro ao carregar carrinho:', error);
+          this.cart = [];
+        }
+      }
+
+      closeTurn() {
+        if (!confirm('Deseja realmente fechar o turno atual?')) return;
+        
+        try {
+          const now = new Date();
+          const closedTurn = {
+            ...this.currentTurn,
+            endTime: now.toLocaleTimeString('pt-BR'),
+            endDate: now.toLocaleDateString('pt-BR'),
+            endTimestamp: now.toISOString(),
+            closed: true
+          };
+          
+          const turnHistory = JSON.parse(localStorage.getItem('turnHistory') || '[]');
+          turnHistory.unshift(closedTurn);
+          localStorage.setItem('turnHistory', JSON.stringify(turnHistory));
+          localStorage.removeItem('activeTurn');
+          localStorage.removeItem('currentCart');
+          
+          this.clearCart();
+          
+          document.getElementById('mainApp').style.display = 'none';
+          document.getElementById('turnSelection').style.display = 'flex';
+          
+          this.hapticFeedback();
+        } catch (error) {
+          console.error('Erro ao fechar turno:', error);
+          this.showNotification('Erro ao fechar turno', 'error');
+        }
+      }
+
+      // KEYBOARD - Sistema de cliques rápidos implementado
+      openKeyboard(target) {
+        this.keyboard.target = target;
+        this.keyboard.value = '';
+        
+        const title = target === 'others' ? 'Inserir preço do produto' : 'Inserir valor';
+        document.getElementById('keyboardTitle').textContent = title;
+        document.getElementById('keyboardDisplay').textContent = '0';
+        
+        document.getElementById('virtualKeyboard').classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+
+      openReceivedKeyboard() {
+        if (this.paymentMethod === 'Cash') {
+          this.openKeyboard('received');
+          document.getElementById('keyboardTitle').textContent = 'Inserir valor recebido';
+        }
+      }
+
+      closeKeyboard() {
+        document.getElementById('virtualKeyboard').classList.remove('show');
+        document.body.style.overflow = '';
+        
+        this.keyboard = { value: '', target: null };
+      }
+
+      // CLIQUES RÁPIDOS NO TECLADO - Resposta imediata
+      inputDigit(digit) {
+        this.keyboard.value += digit;
+        this.updateKeyboardDisplay();
+        this.hapticFeedback();
+      }
+
+      inputComma() {
+        if (!this.keyboard.value.includes(',') && this.keyboard.value.length > 0) {
+          this.keyboard.value += ',';
+          this.updateKeyboardDisplay();
+        }
+      }
+
+      backspace() {
+        this.keyboard.value = this.keyboard.value.slice(0, -1);
+        this.updateKeyboardDisplay();
+      }
+
+      updateKeyboardDisplay() {
+        document.getElementById('keyboardDisplay').textContent = 
+          this.keyboard.value || '0';
+      }
+
+      confirmKeyboard() {
+        const value = parseFloat(this.keyboard.value.replace(',', '.'));
+        
+        if (isNaN(value) || value <= 0) {
+          this.showNotification('Insira um valor válido', 'warning');
+          return;
+        }
+        
+        if (this.keyboard.target === 'others') {
+          this.addProduct('Outros', value);
+        } else if (this.keyboard.target === 'received') {
+          const receivedInput = document.getElementById('receivedInput');
+          if (receivedInput) {
+            receivedInput.value = value.toFixed(2).replace('.', ',');
+            this.updateChange();
+          }
+        }
+        
+        this.closeKeyboard();
+      }
+
+      editItem(index) {
+        // Funcionalidade de edição simplificada
+        const item = this.cart[index];
+        if (!item) return;
+        
+        const newQuantity = prompt(`Editar quantidade de ${item.label}:`, item.quantity);
+        if (newQuantity && !isNaN(newQuantity) && newQuantity > 0) {
+          item.quantity = parseInt(newQuantity);
+          this.updateDisplay();
+        }
+      }
+
+      // NOTIFICATION SYSTEM
+      showNotification(message, type = 'error') {
+        const notification = document.getElementById('notification');
+        const messageEl = document.getElementById('notificationMessage');
+        const iconEl = notification.querySelector('.notification-icon');
+        
+        if (!notification || !messageEl || !iconEl) return;
+
+        const icons = {
+          error: 'fas fa-exclamation-triangle',
+          warning: 'fas fa-exclamation-circle',
+          success: 'fas fa-check-circle'
+        };
+        
+        messageEl.textContent = message;
+        iconEl.className = `notification-icon ${icons[type] || icons.error}`;
+        notification.className = `notification ${type} show`;
+        
+        // Auto hide
+        setTimeout(() => {
+          this.hideNotification();
+        }, type === 'success' ? 2000 : 4000);
+      }
+
+      hideNotification() {
+        const notification = document.getElementById('notification');
+        if (notification) {
+          notification.classList.remove('show');
+        }
+      }
+
+      showMessage(message) {
+        this.showNotification(message, 'warning');
+      }
+
+      // HAPTIC FEEDBACK
+      hapticFeedback() {
+        if ('vibrate' in navigator) {
+          try {
+            navigator.vibrate(10);
+          } catch (error) {
+            // Vibração não suportada
+          }
+        }
+      }
+
+      // EVENT LISTENERS
+      setupEventListeners() {
+        // Prevent context menu and selection
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('selectstart', (e) => e.preventDefault());
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          const keyboard = document.getElementById('virtualKeyboard');
+          if (keyboard && keyboard.classList.contains('show')) {
+            if (e.key >= '0' && e.key <= '9') {
+              e.preventDefault();
+              this.inputDigit(e.key);
+            } else if (e.key === ',' || e.key === '.') {
+              e.preventDefault();
+              this.inputComma();
+            } else if (e.key === 'Backspace') {
+              e.preventDefault();
+              this.backspace();
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              this.confirmKeyboard();
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              this.closeKeyboard();
+            }
+          }
+        });
+      }
+    }
+
+    // Initialize app
+    let app;
+    
+    // Aguardar o DOM estar completamente carregado
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        console.log('🚀 DOM carregado, inicializando app...');
+        app = new CaixaFreitas();
+        app.init();
+        
+        // Tornar o app disponível globalmente
+        window.app = app;
+      } catch (error) {
+        console.error('❌ Falha na inicialização do app:', error);
+        
+        // Fallback em caso de erro crítico
+        document.body.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center; background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);">
+            <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 400px;">
+              <h1 style="color: #E53935; margin-bottom: 20px; font-size: 1.5rem;">⚠️ Erro de Inicialização</h1>
+              <p style="margin-bottom: 20px; color: #666; line-height: 1.5;">A aplicação não pôde ser carregada corretamente. Por favor, tente recarregar a página.</p>
+              <button onclick="location.reload()" style="padding: 15px 30px; background: #4a1a2e; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
+                🔄 Recarregar Aplicação
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    console.log('🚀 Caixa Freitas v8.4 Pro - Sistema Português BR carregado!');
+    console.log('🔧 Melhorias aplicadas:');
+    console.log('   ✅ CLIQUES RÁPIDOS: Sistema sem delays - resposta imediata');
+    console.log('   ✅ TELA DE LOADING: Corrigida - não trava mais');
+    console.log('   ✅ TECLADO VIRTUAL: Aceita digitação rápida');
+    console.log('   ✅ PRODUTOS: Múltiplos cliques registrados instantaneamente');
+    console.log('   ✅ ESTABILIDADE: Estrutura de código reorganizada');
+  </script>
+</body>
+</html>
