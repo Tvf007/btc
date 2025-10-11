@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -65,8 +66,8 @@ button:active{transform:scale(.97)}
 .close-turn-btn{background:linear-gradient(135deg,#6c757d,#424242);color:#fff;font-size:.8rem}
 .history-btn{background:linear-gradient(135deg,#6c757d,#424242);color:#fff;font-size:.85rem}
 .history-btn.pro{background:linear-gradient(135deg,#4a1a2e,#2d0f1c)}
-.modal-overlay{position:fixed;inset:0;background:rgba(26,26,46,.95);backdrop-filter:blur(20px);padding:20px;z-index:2000;display:none;justify-content:center;align-items:center;overflow-y:auto}
-.modal-overlay.show{display:flex;animation:fadeIn .4s}
+.modal-overlay{position:fixed;inset:0;background:rgba(26,26,46,.95);backdrop-filter:blur(20px);padding:20px;z-index:2000;display:none;justify-content:center;align-items:center;overflow-y:auto;pointer-events:none}
+.modal-overlay.show{display:flex;animation:fadeIn .4s;pointer-events:auto}
 .modal-content{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #dee2e6}
 .modal-title{font-weight:800;font-size:1.4rem;display:flex;align-items:center;gap:10px}
@@ -108,8 +109,8 @@ button:active{transform:scale(.97)}
 .summary-box{background:linear-gradient(135deg,rgba(74,26,46,.1),rgba(107,40,67,.1));border-radius:12px;padding:16px;margin-bottom:20px;border:2px solid rgba(74,26,46,.3)}
 .summary-row{display:flex;justify-content:space-between;margin-bottom:10px;font-size:1rem;align-items:center}
 .summary-row.total{font-size:1.3rem;font-weight:900;color:#4a1a2e;padding-top:10px;border-top:2px solid rgba(74,26,46,.3);margin-top:10px}
-.virtual-keyboard{position:fixed;inset:0;background:rgba(26,26,46,.95);backdrop-filter:blur(20px);padding:20px;z-index:3000;display:none;justify-content:center;align-items:center}
-.virtual-keyboard.show{display:flex;animation:fadeIn .4s}
+.virtual-keyboard{position:fixed;inset:0;background:rgba(26,26,46,.95);backdrop-filter:blur(20px);padding:20px;z-index:3000;display:none;justify-content:center;align-items:center;pointer-events:none}
+.virtual-keyboard.show{display:flex;animation:fadeIn .4s;pointer-events:auto}
 .keyboard-container{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .keyboard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #dee2e6}
 .keyboard-title{font-weight:800;font-size:1.15rem}
@@ -566,6 +567,7 @@ function editItemQuantity(index) {
   document.getElementById('keyboardDisplay').textContent = '0';
   document.getElementById('keyboardTitle').textContent = 'Quantidade de ' + item.name;
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function openKeyboard(target) {
@@ -581,6 +583,7 @@ function openKeyboard(target) {
   }
   
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function openReceivedKeyboard() {
@@ -600,6 +603,7 @@ function openReceivedKeyboard() {
   document.getElementById('keyboardDisplay').textContent = '0';
   document.getElementById('keyboardTitle').textContent = 'Valor Recebido';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function openPaymentKeyboard() {
@@ -609,6 +613,7 @@ function openPaymentKeyboard() {
   document.getElementById('keyboardDisplay').textContent = '0';
   document.getElementById('keyboardTitle').textContent = 'Valor do Pagamento';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function openWithdrawalKeyboard() {
@@ -618,6 +623,7 @@ function openWithdrawalKeyboard() {
   document.getElementById('keyboardDisplay').textContent = '0';
   document.getElementById('keyboardTitle').textContent = 'Valor da Sangria';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function editOtherItem(index) {
@@ -629,6 +635,7 @@ function editOtherItem(index) {
   document.getElementById('keyboardDisplay').textContent = '0';
   document.getElementById('keyboardTitle').textContent = 'Novo Valor de "Outros"';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function selectPaymentType(type) {
@@ -668,6 +675,7 @@ function openMixedCashKeyboard() {
   document.getElementById('keyboardDisplay').textContent = 'R$ 0';
   document.getElementById('keyboardTitle').textContent = 'Valor do Caixa';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function openMixedExternalKeyboard() {
@@ -677,6 +685,7 @@ function openMixedExternalKeyboard() {
   document.getElementById('keyboardDisplay').textContent = 'R$ 0';
   document.getElementById('keyboardTitle').textContent = 'Valor Externo';
   document.getElementById('virtualKeyboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
 function updateMixedTotal() {
@@ -792,6 +801,7 @@ function confirmKeyboard() {
 
 function closeKeyboard() {
   document.getElementById('virtualKeyboard').classList.remove('show');
+  document.body.style.overflow = '';
   keyboardValue = '';
   keyboardTarget = null;
   editIndex = null;
@@ -1007,6 +1017,7 @@ function clearCart() {
 
 function openPaymentModal() {
   document.getElementById('paymentModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
   document.getElementById('supplierName').value = '';
   document.getElementById('paymentValue').value = '';
   document.getElementById('paymentTypeCash').checked = false;
@@ -1028,6 +1039,7 @@ function openPaymentModal() {
 
 function closePaymentModal() {
   document.getElementById('paymentModal').classList.remove('show');
+  document.body.style.overflow = '';
 }
 
 function submitPayment(e) {
@@ -1129,12 +1141,14 @@ function submitPayment(e) {
 
 function openWithdrawalModal() {
   document.getElementById('withdrawalModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
   document.getElementById('withdrawalValue').value = '';
   document.getElementById('withdrawalReason').value = '';
 }
 
 function closeWithdrawalModal() {
   document.getElementById('withdrawalModal').classList.remove('show');
+  document.body.style.overflow = '';
 }
 
 function submitWithdrawal(e) {
@@ -1251,11 +1265,13 @@ function printReceipt(saleIndex) {
 
 function openHistoryModal() {
   document.getElementById('historyModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
   updateHistoryDisplay();
 }
 
 function closeHistoryModal() {
   document.getElementById('historyModal').classList.remove('show');
+  document.body.style.overflow = '';
 }
 
 function updateHistoryDisplay() {
@@ -1429,7 +1445,7 @@ function hideNotification() {
 <!-- MÓDULO DE PERSISTÊNCIA E SINCRONIZAÇÃO COM GOOGLE SHEETS -->
 <script>
 (function(){
-const API_URL = 'https://script.google.com/macros/s/AKfycbxdXh5kBkQbQ44MLHmZiVG_tBdp-CJ5XVfy7Bq2ep_dOCOMEJEFTcpQrlpbfcp2CZWI/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycby-z8gSUpveeO066zL_9eRUGQ1HG-GWBpKni8-l6U8RdmuJVFwPQ69JHHsqQF6nybQj/exec';
 const DB_NAME = 'caixa_freitas_db';
 const DB_VERSION = 1;
 let idbDB = null;
