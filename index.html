@@ -1676,9 +1676,9 @@ function showProTurn(turnType) {
 // 🔐 SISTEMA PRO (SENHA)
 // =======================
 
-// URL do seu Google Apps Script
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxfLapr6A4RKVppkk8FL_3ghAsN1DkdXkZxyakqY_ahCYb-1S_xYmU6UR8mdJwJFw9O6jJHsHqfQ6nby0j/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdXh5kBkQbQ44MLHmZiVG_tBdp-CJ5XVfy7Bq2ep_dOCOMEJEFTcpQrlpbfcp2CZWI/exec';
 
+// Abertura do modal de senha Pro
 function openProModal() {
   document.getElementById('proPasswordModal').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -1686,14 +1686,15 @@ function openProModal() {
   document.getElementById('proPasswordError').style.display = 'none';
 }
 
+// Fechar modal de senha
 function closeProPasswordModal() {
   document.getElementById('proPasswordModal').classList.remove('show');
   document.body.style.overflow = '';
 }
 
+// Validação de senha Pro
 async function validateProPassword(event) {
   event.preventDefault();
-
   const passwordInput = document.getElementById('proPassword');
   const enteredPassword = passwordInput.value.trim();
   const errorBox = document.getElementById('proPasswordError');
@@ -1713,24 +1714,19 @@ async function validateProPassword(event) {
       const allPasswords = [...validPasswords, defaultPassword];
 
       if (allPasswords.includes(enteredPassword)) {
-        // ✅ Senha correta — abre histórico Pro
         errorBox.style.display = 'none';
         closeProPasswordModal();
         openProHistoryModal();
         showNotification('Acesso Pro liberado!', 'success');
       } else {
-        // ❌ Senha incorreta
         errorBox.style.display = 'block';
       }
+    } else if (enteredPassword === '2201') {
+      closeProPasswordModal();
+      openProHistoryModal();
+      showNotification('Acesso Pro liberado (modo padrão)', 'warning');
     } else {
-      // Se houver erro no retorno, ainda permite senha padrão
-      if (enteredPassword === '2201') {
-        closeProPasswordModal();
-        openProHistoryModal();
-        showNotification('Acesso Pro liberado (modo padrão)', 'warning');
-      } else {
-        errorBox.style.display = 'block';
-      }
+      errorBox.style.display = 'block';
     }
   } catch (error) {
     console.error('Erro ao validar senha:', error);
@@ -1738,11 +1734,11 @@ async function validateProPassword(event) {
   }
 }
 
+// Abrir e fechar histórico Pro
 function openProHistoryModal() {
   document.getElementById('proHistoryModal').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
-
 function closeProHistoryModal() {
   document.getElementById('proHistoryModal').classList.remove('show');
   document.body.style.overflow = '';
@@ -2047,9 +2043,9 @@ console.log('[sync] Sistema de sincronização carregado - URL:', API_URL);
 // 🔐 SISTEMA PRO (SENHA)
 // =======================
 
-// URL do seu Google Apps Script
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxfLapr6A4RKVppkk8FL_3ghAsN1DkdXkZxyakqY_ahCYb-1S_xYmU6UR8mdJwJFw9O6jJHsHqfQ6nby0j/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdXh5kBkQbQ44MLHmZiVG_tBdp-CJ5XVfy7Bq2ep_dOCOMEJEFTcpQrlpbfcp2CZWI/exec';
 
+// Abertura do modal de senha Pro
 function openProModal() {
   document.getElementById('proPasswordModal').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -2057,14 +2053,15 @@ function openProModal() {
   document.getElementById('proPasswordError').style.display = 'none';
 }
 
+// Fechar modal de senha
 function closeProPasswordModal() {
   document.getElementById('proPasswordModal').classList.remove('show');
   document.body.style.overflow = '';
 }
 
+// Validação de senha Pro
 async function validateProPassword(event) {
   event.preventDefault();
-
   const passwordInput = document.getElementById('proPassword');
   const enteredPassword = passwordInput.value.trim();
   const errorBox = document.getElementById('proPasswordError');
@@ -2084,24 +2081,19 @@ async function validateProPassword(event) {
       const allPasswords = [...validPasswords, defaultPassword];
 
       if (allPasswords.includes(enteredPassword)) {
-        // ✅ Senha correta — abre histórico Pro
         errorBox.style.display = 'none';
         closeProPasswordModal();
         openProHistoryModal();
         showNotification('Acesso Pro liberado!', 'success');
       } else {
-        // ❌ Senha incorreta
         errorBox.style.display = 'block';
       }
+    } else if (enteredPassword === '2201') {
+      closeProPasswordModal();
+      openProHistoryModal();
+      showNotification('Acesso Pro liberado (modo padrão)', 'warning');
     } else {
-      // Se houver erro no retorno, ainda permite senha padrão
-      if (enteredPassword === '2201') {
-        closeProPasswordModal();
-        openProHistoryModal();
-        showNotification('Acesso Pro liberado (modo padrão)', 'warning');
-      } else {
-        errorBox.style.display = 'block';
-      }
+      errorBox.style.display = 'block';
     }
   } catch (error) {
     console.error('Erro ao validar senha:', error);
@@ -2109,11 +2101,11 @@ async function validateProPassword(event) {
   }
 }
 
+// Abrir e fechar histórico Pro
 function openProHistoryModal() {
   document.getElementById('proHistoryModal').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
-
 function closeProHistoryModal() {
   document.getElementById('proHistoryModal').classList.remove('show');
   document.body.style.overflow = '';
