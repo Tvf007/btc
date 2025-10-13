@@ -239,7 +239,7 @@ placeholder="Valor recebido" readonly onclick="openReceivedKeyboard()">
 <button class="action-btn history-btn" onclick="openHistoryModal()">
 <i class="fas fa-history"></i> Histórico
 </button>
-<button class="action-btn history-btn pro" onclick="showNotification('Em desenvolvimento - Requer senha', 'warning')">
+<button class="action-btn history-btn pro" onclick="openProModal()">
 <i class="fas fa-chart-line"></i> Pro
 </button>
 </div>
@@ -410,6 +410,124 @@ placeholder="Valor recebido" readonly onclick="openReceivedKeyboard()">
 <i class="fas fa-list"></i> Movimentações do Turno
 </h4>
 <div class="history-list" id="historyList"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="proPasswordModal">
+<div class="modal-content" style="max-width:400px">
+<div class="modal-header">
+<h3 class="modal-title">
+<i class="fas fa-lock"></i> Acesso Pro
+</h3>
+<button class="modal-close" onclick="closeProPasswordModal()">×</button>
+</div>
+<div style="text-align:center;margin-bottom:20px">
+<i class="fas fa-shield-alt" style="font-size:3rem;color:#4a1a2e;margin-bottom:10px"></i>
+<p style="color:#6c757d;font-size:.95rem">Digite a senha de acesso ao histórico profissional</p>
+</div>
+<form onsubmit="validateProPassword(event)">
+<div class="form-group">
+<label class="form-label">Senha de Acesso</label>
+<input type="password" class="form-input" id="proPassword" required placeholder="••••••••" autocomplete="off">
+</div>
+<div id="proPasswordError" style="display:none;background:rgba(229,57,53,0.1);padding:12px;border-radius:8px;margin-bottom:16px;border:2px solid rgba(229,57,53,0.3)">
+<div style="display:flex;align-items:center;gap:8px;color:#E53935;font-weight:700;font-size:.9rem">
+<i class="fas fa-exclamation-circle"></i>
+<span>Senha incorreta! Tente novamente.</span>
+</div>
+</div>
+<div class="form-actions">
+<button type="button" class="btn-cancel" onclick="closeProPasswordModal()">Cancelar</button>
+<button type="submit" class="btn-submit">
+<i class="fas fa-unlock"></i> Acessar
+</button>
+</div>
+</form>
+</div>
+</div>
+
+<div class="modal-overlay" id="proHistoryModal">
+<div class="modal-content" style="max-width:600px">
+<div class="modal-header">
+<h3 class="modal-title">
+<i class="fas fa-chart-line"></i> Histórico Profissional
+</h3>
+<button class="modal-close" onclick="closeProHistoryModal()">×</button>
+</div>
+
+<div style="background:linear-gradient(135deg,#4a1a2e,#2d0f1c);border-radius:12px;padding:16px;margin-bottom:20px;color:#fff">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<span style="font-weight:700;font-size:.9rem">Resumo Geral dos Turnos</span>
+<i class="fas fa-chart-pie" style="font-size:1.5rem;opacity:.5"></i>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:10px">
+<div style="font-size:.75rem;opacity:.8;margin-bottom:4px">☀️ Turno Manhã</div>
+<div style="font-size:1.2rem;font-weight:900" id="proMorningTotal">R$ 0,00</div>
+</div>
+<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:10px">
+<div style="font-size:.75rem;opacity:.8;margin-bottom:4px">🌅 Turno Tarde</div>
+<div style="font-size:1.2rem;font-weight:900" id="proAfternoonTotal">R$ 0,00</div>
+</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+<button class="action-btn" style="background:linear-gradient(135deg,#28a745,#218838);color:#fff" onclick="showProTurn('morning')">
+<i class="fas fa-sun"></i> Ver Manhã
+</button>
+<button class="action-btn" style="background:linear-gradient(135deg,#FF9800,#F57C00);color:#fff" onclick="showProTurn('afternoon')">
+<i class="fas fa-cloud-sun"></i> Ver Tarde
+</button>
+</div>
+
+<div id="proTurnDetails" style="display:none">
+<h4 style="font-weight:800;margin-bottom:12px;color:#2c3e50;display:flex;align-items:center;gap:8px">
+<i class="fas fa-list-alt"></i> <span id="proTurnTitle">Detalhes do Turno</span>
+</h4>
+
+<div class="summary-box">
+<div class="summary-row">
+<span><i class="fas fa-money-bill-wave"></i> Vendas em Dinheiro:</span>
+<strong id="proTurnCash">R$ 0,00</strong>
+</div>
+<div class="summary-row">
+<span><i class="fas fa-credit-card"></i> Vendas Cartão/PIX:</span>
+<strong id="proTurnCard">R$ 0,00</strong>
+</div>
+<div class="summary-row">
+<span><i class="fas fa-hand-holding-usd"></i> Pagamentos (caixa):</span>
+<strong id="proTurnPaymentsCash" style="color:#E53935">R$ 0,00</strong>
+</div>
+<div class="summary-row">
+<span><i class="fas fa-hand-holding-usd"></i> Pagamentos (externos):</span>
+<strong id="proTurnPaymentsExt" style="color:#6c757d">R$ 0,00</strong>
+</div>
+<div class="summary-row">
+<span><i class="fas fa-money-bill-wave"></i> Sangrias:</span>
+<strong id="proTurnWithdrawals" style="color:#E53935">R$ 0,00</strong>
+</div>
+<div class="summary-row total">
+<span>💰 Total de Vendas:</span>
+<span id="proTurnTotalSales">R$ 0,00</span>
+</div>
+<div class="summary-row">
+<span>💵 Dinheiro em Caixa:</span>
+<strong id="proTurnCashBalance" style="color:#28a745">R$ 0,00</strong>
+</div>
+<div class="summary-row" style="border-top:2px solid #4a1a2e;padding-top:10px;margin-top:10px">
+<span style="font-weight:900">📊 Total de Movimentações:</span>
+<strong id="proTurnMovements" style="color:#4a1a2e">0</strong>
+</div>
+</div>
+</div>
+
+<div style="margin-top:20px;padding:12px;background:rgba(74,26,46,0.05);border-radius:8px;border:2px solid rgba(74,26,46,0.2)">
+<div style="display:flex;align-items:center;gap:8px;color:#4a1a2e;font-weight:700;font-size:.85rem">
+<i class="fas fa-info-circle"></i>
+<span>Dados consolidados de todos os turnos do dia</span>
+</div>
+</div>
 </div>
 </div>
 
@@ -1440,12 +1558,202 @@ function showNotification(message, type) {
 function hideNotification() {
   document.getElementById('notification').classList.remove('show');
 }
+
+// Funções do Sistema Pro
+var validProPasswords = [];
+var proPasswordsLoaded = false;
+
+function openProModal() {
+  document.getElementById('proPasswordModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('proPassword').value = '';
+  document.getElementById('proPasswordError').style.display = 'none';
+  
+  // Carrega senhas da planilha se ainda não carregou
+  if (!proPasswordsLoaded) {
+    loadProPasswords();
+  }
+}
+
+function closeProPasswordModal() {
+  document.getElementById('proPasswordModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+async function loadProPasswords() {
+  try {
+    showNotification('Carregando senhas...', 'warning');
+    
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycby-z8gSUpveeO066zL_9eRUGQ1HG-GWBpKni8-l6U8RdmuJVFwPQ69JHHsqQF6nybQj/exec?action=getPasswords';
+    
+    const response = await fetch(SHEET_URL, {
+      method: 'GET',
+      mode: 'cors'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.passwords && Array.isArray(data.passwords)) {
+        validProPasswords = data.passwords.filter(p => p && p.trim() !== '');
+        proPasswordsLoaded = true;
+        console.log('[Pro] Senhas carregadas:', validProPasswords.length);
+        showNotification('Senhas carregadas com sucesso!', 'success');
+      }
+    }
+  } catch (error) {
+    console.warn('[Pro] Erro ao carregar senhas:', error);
+    // Senha padrão de fallback
+    validProPasswords = ['admin123', '1234'];
+    showNotification('Usando senhas padrão', 'warning');
+  }
+}
+
+function validateProPassword(e) {
+  e.preventDefault();
+  
+  var password = document.getElementById('proPassword').value;
+  var errorDiv = document.getElementById('proPasswordError');
+  
+  // Verifica se a senha está na lista
+  var isValid = validProPasswords.includes(password);
+  
+  if (isValid) {
+    errorDiv.style.display = 'none';
+    closeProPasswordModal();
+    openProHistoryModal();
+  } else {
+    errorDiv.style.display = 'block';
+    document.getElementById('proPassword').value = '';
+    document.getElementById('proPassword').focus();
+  }
+}
+
+function openProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  updateProHistoryDisplay();
+}
+
+function closeProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.remove('show');
+  document.body.style.overflow = '';
+  document.getElementById('proTurnDetails').style.display = 'none';
+}
+
+function updateProHistoryDisplay() {
+  // Calcula totais de cada turno
+  var morningTotal = turnsData.morning.totalCash + turnsData.morning.totalCard;
+  var afternoonTotal = turnsData.afternoon.totalCash + turnsData.afternoon.totalCard;
+  
+  document.getElementById('proMorningTotal').textContent = 'R$ ' + morningTotal.toFixed(2).replace('.', ',');
+  document.getElementById('proAfternoonTotal').textContent = 'R$ ' + afternoonTotal.toFixed(2).replace('.', ',');
+}
+
+function showProTurn(turnType) {
+  var turnData = turnsData[turnType];
+  var turnName = turnType === 'morning' ? '☀️ Turno da Manhã' : '🌅 Turno da Tarde';
+  
+  document.getElementById('proTurnTitle').textContent = turnName;
+  document.getElementById('proTurnCash').textContent = 'R$ ' + turnData.totalCash.toFixed(2).replace('.', ',');
+  document.getElementById('proTurnCard').textContent = 'R$ ' + turnData.totalCard.toFixed(2).replace('.', ',');
+  document.getElementById('proTurnPaymentsCash').textContent = 'R$ ' + turnData.totalPaymentsCash.toFixed(2).replace('.', ',');
+  document.getElementById('proTurnPaymentsExt').textContent = 'R$ ' + turnData.totalPaymentsExternal.toFixed(2).replace('.', ',');
+  document.getElementById('proTurnWithdrawals').textContent = 'R$ ' + turnData.totalWithdrawals.toFixed(2).replace('.', ',');
+  
+  var totalSales = turnData.totalCash + turnData.totalCard;
+  document.getElementById('proTurnTotalSales').textContent = 'R$ ' + totalSales.toFixed(2).replace('.', ',');
+  
+  var cashBalance = turnData.totalCash - turnData.totalPaymentsCash - turnData.totalWithdrawals;
+  document.getElementById('proTurnCashBalance').textContent = 'R$ ' + cashBalance.toFixed(2).replace('.', ',');
+  
+  document.getElementById('proTurnMovements').textContent = turnData.history.length;
+  
+  document.getElementById('proTurnDetails').style.display = 'block';
+}
+
+
+// =======================
+// 🔐 SISTEMA PRO (SENHA)
+// =======================
+
+// URL do seu Google Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxfLapr6A4RKVppkk8FL_3ghAsN1DkdXkZxyakqY_ahCYb-1S_xYmU6UR8mdJwJFw9O6jJHsHqfQ6nby0j/exec';
+
+function openProModal() {
+  document.getElementById('proPasswordModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('proPassword').value = '';
+  document.getElementById('proPasswordError').style.display = 'none';
+}
+
+function closeProPasswordModal() {
+  document.getElementById('proPasswordModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+async function validateProPassword(event) {
+  event.preventDefault();
+
+  const passwordInput = document.getElementById('proPassword');
+  const enteredPassword = passwordInput.value.trim();
+  const errorBox = document.getElementById('proPasswordError');
+
+  if (!enteredPassword) {
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPasswords`);
+    const data = await response.json();
+
+    if (data.status === 'success' && Array.isArray(data.passwords)) {
+      const validPasswords = data.passwords.map(p => String(p).trim());
+      const defaultPassword = '2201';
+      const allPasswords = [...validPasswords, defaultPassword];
+
+      if (allPasswords.includes(enteredPassword)) {
+        // ✅ Senha correta — abre histórico Pro
+        errorBox.style.display = 'none';
+        closeProPasswordModal();
+        openProHistoryModal();
+        showNotification('Acesso Pro liberado!', 'success');
+      } else {
+        // ❌ Senha incorreta
+        errorBox.style.display = 'block';
+      }
+    } else {
+      // Se houver erro no retorno, ainda permite senha padrão
+      if (enteredPassword === '2201') {
+        closeProPasswordModal();
+        openProHistoryModal();
+        showNotification('Acesso Pro liberado (modo padrão)', 'warning');
+      } else {
+        errorBox.style.display = 'block';
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao validar senha:', error);
+    showNotification('Erro ao verificar senha. Tente novamente.', 'error');
+  }
+}
+
+function openProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 </script>
 
 <!-- MÓDULO DE PERSISTÊNCIA E SINCRONIZAÇÃO COM GOOGLE SHEETS -->
 <script>
 (function(){
-const API_URL = 'https://script.google.com/macros/s/AKfycbxdXh5kBkQbQ44MLHmZiVG_tBdp-CJ5XVfy7Bq2ep_dOCOMEJEFTcpQrlpbfcp2CZWI/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycby-z8gSUpveeO066zL_9eRUGQ1HG-GWBpKni8-l6U8RdmuJVFwPQ69JHHsqQF6nybQj/exec';
 const DB_NAME = 'caixa_freitas_db';
 const DB_VERSION = 1;
 let idbDB = null;
@@ -1734,6 +2042,83 @@ wrapFunction('submitWithdrawal', function(){
 console.log('[sync] Sistema de sincronização carregado - URL:', API_URL);
 
 })();
+
+// =======================
+// 🔐 SISTEMA PRO (SENHA)
+// =======================
+
+// URL do seu Google Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxfLapr6A4RKVppkk8FL_3ghAsN1DkdXkZxyakqY_ahCYb-1S_xYmU6UR8mdJwJFw9O6jJHsHqfQ6nby0j/exec';
+
+function openProModal() {
+  document.getElementById('proPasswordModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('proPassword').value = '';
+  document.getElementById('proPasswordError').style.display = 'none';
+}
+
+function closeProPasswordModal() {
+  document.getElementById('proPasswordModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+async function validateProPassword(event) {
+  event.preventDefault();
+
+  const passwordInput = document.getElementById('proPassword');
+  const enteredPassword = passwordInput.value.trim();
+  const errorBox = document.getElementById('proPasswordError');
+
+  if (!enteredPassword) {
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPasswords`);
+    const data = await response.json();
+
+    if (data.status === 'success' && Array.isArray(data.passwords)) {
+      const validPasswords = data.passwords.map(p => String(p).trim());
+      const defaultPassword = '2201';
+      const allPasswords = [...validPasswords, defaultPassword];
+
+      if (allPasswords.includes(enteredPassword)) {
+        // ✅ Senha correta — abre histórico Pro
+        errorBox.style.display = 'none';
+        closeProPasswordModal();
+        openProHistoryModal();
+        showNotification('Acesso Pro liberado!', 'success');
+      } else {
+        // ❌ Senha incorreta
+        errorBox.style.display = 'block';
+      }
+    } else {
+      // Se houver erro no retorno, ainda permite senha padrão
+      if (enteredPassword === '2201') {
+        closeProPasswordModal();
+        openProHistoryModal();
+        showNotification('Acesso Pro liberado (modo padrão)', 'warning');
+      } else {
+        errorBox.style.display = 'block';
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao validar senha:', error);
+    showNotification('Erro ao verificar senha. Tente novamente.', 'error');
+  }
+}
+
+function openProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProHistoryModal() {
+  document.getElementById('proHistoryModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 </script>
 
 </body>
