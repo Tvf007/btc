@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Caixa Freitas v9.0 Premium</title>
+<title>Caixa Freitas v9.1 Premium</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -159,7 +159,7 @@ button:active{transform:scale(.97)}
 
 <div id="mainApp">
 <header class="header">
-<h1>Caixa Freitas</h1>
+<h1>Caixa Freitas v9.1</h1>
 <div class="turno-info">
 <i class="fas fa-clock"></i>
 <span id="turnText">Carregando...</span>
@@ -1160,6 +1160,7 @@ function closePaymentModal() {
   document.body.style.overflow = '';
 }
 
+// 🔥 FUNÇÃO CORRIGIDA - submitPayment
 function submitPayment(e) {
   e.preventDefault();
   
@@ -1216,14 +1217,16 @@ function submitPayment(e) {
     }
   }
   
-  // CRIA O OBJETO lastCreatedPayment ANTES DE ADICIONAR AO HISTÓRICO
+  // 🔥 CORREÇÃO: CRIA O OBJETO SEM "Pagamento a" E COM OS CAMPOS CORRETOS
   window.lastCreatedPayment = {
     data: new Date().toLocaleDateString('pt-BR'),
     hora: new Date().toLocaleTimeString('pt-BR'),
     turno: currentTurn ? currentTurn.name : 'Não definido',
-    detalhes: 'Pagamento a ' + supplierName,
+    fornecedor: supplierName,  // 🔥 SEM "Pagamento a"
     total: paymentValue,
-    fornecedor: supplierName
+    paymentType: currentPaymentType,  // 🔥 ADICIONA O TIPO
+    fromCashAmount: fromCashAmount,   // 🔥 VALOR DO CAIXA
+    externalAmount: externalAmount    // 🔥 VALOR EXTERNO
   };
   
   var payment = {
@@ -1569,7 +1572,6 @@ function openProModal() {
   document.getElementById('proPassword').value = '';
   document.getElementById('proPasswordError').style.display = 'none';
   
-  // Carrega senhas da planilha se ainda não carregou
   if (!proPasswordsLoaded) {
     loadProPasswords();
   }
@@ -1602,7 +1604,6 @@ async function loadProPasswords() {
     }
   } catch (error) {
     console.warn('[Pro] Erro ao carregar senhas:', error);
-    // Senha padrão de fallback
     validProPasswords = ['admin123', '1234'];
     showNotification('Usando senhas padrão', 'warning');
   }
@@ -1614,7 +1615,6 @@ function validateProPassword(e) {
   var password = document.getElementById('proPassword').value;
   var errorDiv = document.getElementById('proPasswordError');
   
-  // Verifica se a senha está na lista
   var isValid = validProPasswords.includes(password);
   
   if (isValid) {
@@ -1641,7 +1641,6 @@ function closeProHistoryModal() {
 }
 
 function updateProHistoryDisplay() {
-  // Calcula totais de cada turno
   var morningTotal = turnsData.morning.totalCash + turnsData.morning.totalCard;
   var afternoonTotal = turnsData.afternoon.totalCash + turnsData.afternoon.totalCard;
   
